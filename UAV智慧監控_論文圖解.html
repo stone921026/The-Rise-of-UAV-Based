@@ -1,0 +1,1864 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>無人機智慧監控圖解</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f1;--card:#ffffff;--soft:#efeee9;--fg:#1c1d20;--muted:#646a73;--line:#dcdad3;
+  --blue:#2563d9;--blue-s:#e2ebfb;--orange:#dd6b16;--orange-s:#fcebdc;--green:#178a5c;--green-s:#dcf1e7;
+  --red:#d23c3c;--red-s:#f9e0e0;--purple:#7350e0;--purple-s:#ebe5fb;--teal:#0f8597;--teal-s:#dcf0f3;--amber:#b98900;--amber-s:#f7efd2;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#111317;--card:#1a1d22;--soft:#23272e;--fg:#e8e9eb;--muted:#9aa1ab;--line:#30353d;
+    --blue:#5b8ff0;--blue-s:#1c2a45;--orange:#f08a3c;--orange-s:#3a2617;--green:#3cbf86;--green-s:#16302a;
+    --red:#f06464;--red-s:#3a1d1f;--purple:#9a80f5;--purple-s:#2a2342;--teal:#3bb3c4;--teal-s:#143036;--amber:#e0b23a;--amber-s:#352c12;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111317;--card:#1a1d22;--soft:#23272e;--fg:#e8e9eb;--muted:#9aa1ab;--line:#30353d;
+  --blue:#5b8ff0;--blue-s:#1c2a45;--orange:#f08a3c;--orange-s:#3a2617;--green:#3cbf86;--green-s:#16302a;
+  --red:#f06464;--red-s:#3a1d1f;--purple:#9a80f5;--purple-s:#2a2342;--teal:#3bb3c4;--teal-s:#143036;--amber:#e0b23a;--amber-s:#352c12;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:56px}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+a{color:var(--blue)}
+nav.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;gap:4px;overflow-x:auto;padding:8px 16px;scrollbar-width:none;align-items:center}
+nav.top .wrap::-webkit-scrollbar{display:none}
+nav.top a{flex:none;font-size:13px;padding:3px 10px;border-radius:99px;color:var(--muted);text-decoration:none;border:1px solid transparent;white-space:nowrap}
+nav.top a.on{color:var(--fg);border-color:var(--line);background:var(--card)}
+#themeBtn{flex:none;margin-left:auto;font-size:13px;padding:3px 10px}
+header.hero{padding:52px 0 28px}
+h1{font-size:clamp(28px,5.2vw,46px);line-height:1.22;margin:.25em 0 .3em;font-weight:900;letter-spacing:-.01em}
+h2{font-size:clamp(23px,3.4vw,31px);line-height:1.3;margin:.2em 0 .4em;font-weight:900}
+h3{font-size:19px;margin:1.8em 0 .4em;line-height:1.4}
+h4{font-size:16px;margin:1.2em 0 .2em}
+p{margin:.5em 0}
+section{padding:52px 0 40px;border-top:1px solid var(--line)}
+.kicker{font-size:13px;letter-spacing:.06em;color:var(--blue);font-weight:700}
+.lead{font-size:18px;color:var(--muted);max-width:44em}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+b.hl{background:linear-gradient(transparent 60%,var(--amber-s) 60%);font-weight:700}
+.fig{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 12px;margin:18px 0}
+.fig-h{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:15px;font-weight:700;margin-bottom:4px}
+.tag{font-size:11px;padding:1px 8px;border-radius:99px;background:var(--soft);color:var(--muted);font-weight:700;letter-spacing:.04em}
+.tag.anim{background:var(--blue-s);color:var(--blue)}
+.tag.int{background:var(--orange-s);color:var(--orange)}
+.tag.flow{background:var(--green-s);color:var(--green)}
+.sv{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sv svg{display:block;width:100%;min-width:620px;height:auto}
+.sv.narrow svg{min-width:0}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px;margin-top:8px}
+.ctrl label{display:flex;align-items:center;gap:6px}
+button{font:inherit;font-size:14px;padding:4px 14px;border-radius:8px;border:1px solid var(--line);background:var(--soft);color:var(--fg);cursor:pointer;line-height:1.6}
+button:hover{border-color:var(--blue)}
+button.pri{background:var(--blue);color:#fff;border-color:var(--blue)}
+button.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+input[type=range]{accent-color:var(--blue);width:150px}
+.cap{font-size:14px;color:var(--muted);min-height:1.6em;margin-top:4px}
+.cap b{color:var(--fg)}
+.key{background:var(--soft);border-left:4px solid var(--blue);padding:10px 14px;border-radius:0 10px 10px 0;margin:16px 0}
+.key.warn{border-left-color:var(--amber)}
+.key.red{border-left-color:var(--red)}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.card h4{margin:0 0 4px}
+.stat{font-size:30px;font-weight:900;line-height:1.1}
+.stat small{font-size:14px;font-weight:500;color:var(--muted)}
+table.t{border-collapse:collapse;width:100%;font-size:14px;line-height:1.55}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+table.t th{font-size:13px;color:var(--muted);font-weight:700}
+.tw{overflow-x:auto}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
+.pane{display:none}.pane.show{display:block}
+.chip{display:inline-block;font-size:12.5px;padding:1px 9px;border-radius:99px;border:1px solid var(--line);margin:2px 3px 2px 0;background:var(--soft)}
+.pro{color:var(--green);font-weight:700}.con{color:var(--red);font-weight:700}
+ul.tight{margin:.3em 0;padding-left:1.2em}ul.tight li{margin:.15em 0}
+.ref{font-size:12px;color:var(--muted);font-weight:500}
+.rq{display:block;text-decoration:none;color:inherit}
+.rq .n{font-size:12px;font-weight:900;color:var(--blue)}
+.rq:hover{border-color:var(--blue)}
+footer{padding:40px 0 60px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+/* SVG */
+svg text{font-family:inherit}
+.tx{font-size:13px}
+.ts{font-size:11px}
+.tb{font-size:15px;font-weight:700}
+.tbig{font-size:26px;font-weight:900}
+:where(.tx,.tb,.tbig):not([fill]){fill:var(--fg)}
+:where(.ts):not([fill]){fill:var(--muted)}
+.nd{fill:var(--card);stroke:var(--line);stroke-width:1.5}
+.ln{stroke:var(--muted);stroke-width:1.6;fill:none}
+.lnd{stroke:var(--muted);stroke-width:1.4;fill:none;stroke-dasharray:4 4}
+.fB{fill:var(--blue)}.fR{fill:var(--red)}.fG{fill:var(--green)}.fO{fill:var(--orange)}.fP{fill:var(--purple)}.fT{fill:var(--teal)}.fA{fill:var(--amber)}
+.fM{fill:var(--muted)}.fS{fill:var(--soft)}.fC{fill:var(--card)}.fF{fill:var(--fg)}.fL{fill:var(--line)}
+.fBs{fill:var(--blue-s)}.fRs{fill:var(--red-s)}.fGs{fill:var(--green-s)}.fOs{fill:var(--orange-s)}.fPs{fill:var(--purple-s)}.fAs{fill:var(--amber-s)}.fTs{fill:var(--teal-s)}
+.sB{stroke:var(--blue)}.sR{stroke:var(--red)}.sG{stroke:var(--green)}.sO{stroke:var(--orange)}.sP{stroke:var(--purple)}.sM{stroke:var(--muted)}.sF{stroke:var(--fg)}.sL{stroke:var(--line)}.sA{stroke:var(--amber)}.sT{stroke:var(--teal)}
+.cB{color:var(--blue)}.cR{color:var(--red)}.cG{color:var(--green)}.cO{color:var(--orange)}.cP{color:var(--purple)}.cM{color:var(--muted)}.cF{color:var(--fg)}.cT{color:var(--teal)}.cA{color:var(--amber)}
+.mk{fill:var(--muted)}.mkB{fill:var(--blue)}.mkR{fill:var(--red)}.mkG{fill:var(--green)}.mkO{fill:var(--orange)}
+.dot{transition:transform .9s cubic-bezier(.45,.05,.2,1),fill .4s}
+.fade{transition:opacity .4s}
+.on-path{stroke:var(--blue)!important;stroke-width:3!important}
+.on-node{stroke:var(--blue)!important;stroke-width:2.5!important}
+/* drone mini animations */
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes spin{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.25)}}
+@keyframes ground{from{transform:translateX(0)}to{transform:translateX(-40px)}}
+@keyframes flapU{0%,100%{transform:rotate(-28deg)}50%{transform:rotate(22deg)}}
+@keyframes flapD{0%,100%{transform:rotate(28deg)}50%{transform:rotate(-22deg)}}
+@keyframes sway{0%,100%{transform:translate(0,0) rotate(-2deg)}50%{transform:translate(10px,3px) rotate(2deg)}}
+@keyframes wind{from{transform:translateX(-60px);opacity:0}30%{opacity:.8}to{transform:translateX(220px);opacity:0}}
+@keyframes vtol{0%{transform:translate(0,0) rotate(0)}30%{transform:translate(0,-46px) rotate(0)}45%{transform:translate(10px,-50px) rotate(0)}80%{transform:translate(150px,-52px) rotate(0)}80.01%{transform:translate(150px,-52px);opacity:0}81%{transform:translate(0,0);opacity:0}100%{transform:translate(0,0);opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.bob{animation:bob 1.6s ease-in-out infinite}
+.spin{animation:spin .18s linear infinite;transform-box:fill-box;transform-origin:center}
+.ground{animation:ground 1.2s linear infinite}
+.flapU{animation:flapU .5s ease-in-out infinite;transform-box:fill-box;transform-origin:100% 100%}
+.flapD{animation:flapD .5s ease-in-out infinite;transform-box:fill-box;transform-origin:100% 0%}
+.sway{animation:sway 4s ease-in-out infinite}
+.wind{animation:wind 2.4s linear infinite}
+.vtol{animation:vtol 5s ease-in-out infinite}
+.pulse{animation:pulse 1.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.bob,.spin,.ground,.flapU,.flapD,.sway,.wind,.vtol,.pulse{animation:none}}
+.drone-card svg{width:100%;height:auto;display:block;background:var(--soft);border-radius:10px}
+.rate i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--line);margin-right:3px}
+.rate i.f{background:var(--blue)}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.blk{flex:1 1 150px;min-width:150px;background:var(--soft);border:2px solid var(--green);border-radius:10px;padding:8px 10px;font-size:13px}
+.blk.bad{border-color:var(--red);background:var(--red-s)}
+.blk input{width:100%;font:inherit;font-size:13px;padding:2px 6px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+.chainrow{display:flex;gap:8px;align-items:stretch;overflow-x:auto;padding-bottom:4px}
+.chainrow .arr{align-self:center;color:var(--muted);flex:none}
+</style>
+<script>
+const NS='http://www.w3.org/2000/svg';
+function S(tag,attrs,parent){const e=document.createElementNS(NS,tag);if(attrs)for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function T(parent,x,y,txt,cls,extra){const e=S('text',Object.assign({x,y,class:cls||'tx'},extra||{}),parent);e.textContent=txt;return e;}
+function U(parent,id,cx,cy,w,h,cls){return S('use',{href:'#'+id,x:cx-w/2,y:cy-h/2,width:w,height:h,class:cls||''},parent);}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function tween(dur,fn,ease){ease=ease||(t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2);return new Promise(res=>{const t0=performance.now();function f(now){const t=Math.min(1,(now-t0)/dur);fn(ease(t));if(t<1)requestAnimationFrame(f);else res();}requestAnimationFrame(f);});}
+function onVisible(el,fn,th){const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){io.disconnect();fn();}});},{threshold:th||0.25});io.observe(el);}
+function rng(seed){return()=>{seed=(seed*1664525+1013904223)%4294967296;return seed/4294967296;};}
+/* cancellable player: fn(W) where W(ms) sleeps and throws if cancelled */
+function player(btn,fn){let tk={c:true};async function go(){tk.c=true;const my={c:false};tk=my;btn.textContent='↺ 重播';const W=async ms=>{await sleep(ms);if(my.c)throw 'stop';};try{await fn(W,my);}catch(e){if(e!=='stop')console.error(e);}}btn.addEventListener('click',go);return go;}
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <marker id="ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk"/></marker>
+  <marker id="ahB" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mkB"/></marker>
+  <marker id="ahR" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mkR"/></marker>
+  <marker id="ahG" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mkG"/></marker>
+  <marker id="ahO" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mkO"/></marker>
+  <symbol id="i-quad" viewBox="-24 -14 48 28"><g fill="currentColor" stroke="currentColor">
+    <line x1="-16" y1="-5" x2="16" y2="-5" stroke-width="2.5"/><rect x="-7" y="-8" width="14" height="9" rx="3" stroke="none"/>
+    <ellipse cx="-16" cy="-9" rx="8" ry="2" stroke="none" opacity=".7"/><ellipse cx="16" cy="-9" rx="8" ry="2" stroke="none" opacity=".7"/>
+    <line x1="-16" y1="-9" x2="-16" y2="-5" stroke-width="2"/><line x1="16" y1="-9" x2="16" y2="-5" stroke-width="2"/>
+    <line x1="-5" y1="1" x2="-8" y2="7" stroke-width="1.6"/><line x1="5" y1="1" x2="8" y2="7" stroke-width="1.6"/><circle cx="0" cy="3" r="2.6" stroke="none"/></g></symbol>
+  <symbol id="i-cloud" viewBox="0 0 64 40"><path fill="currentColor" d="M16 36h34a12 12 0 0 0 0-24a16 16 0 0 0-30-4a12 12 0 0 0-4 28z"/></symbol>
+  <symbol id="i-tower" viewBox="0 0 40 48"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 16L11 46M20 16l9 30M14 36h12"/><path d="M13 11a9 9 0 0 1 14 0M8 6a16 16 0 0 1 24 0"/></g><circle cx="20" cy="15" r="3" fill="currentColor"/></symbol>
+  <symbol id="i-person" viewBox="0 0 20 36"><g fill="currentColor"><circle cx="10" cy="6" r="5"/><path d="M3 34L5 16Q10 12 15 16L17 34Z"/></g></symbol>
+  <symbol id="i-chip" viewBox="0 0 40 40"><g fill="currentColor"><rect x="9" y="9" width="22" height="22" rx="3"/></g><g stroke="currentColor" stroke-width="2.2"><path d="M14 3v6M20 3v6M26 3v6M14 31v6M20 31v6M26 31v6M3 14h6M3 20h6M3 26h6M31 14h6M31 20h6M31 26h6"/></g></symbol>
+  <symbol id="i-cam" viewBox="0 0 44 32"><g fill="currentColor"><rect x="2" y="8" width="40" height="22" rx="4"/><rect x="14" y="3" width="14" height="7" rx="2"/></g><circle cx="22" cy="19" r="7" fill="var(--card)"/><circle cx="22" cy="19" r="3.5" fill="currentColor"/></symbol>
+  <symbol id="i-car" viewBox="0 0 40 22"><g fill="currentColor"><path d="M3 14L7 6Q9 3 13 3H27Q31 3 33 6L37 14V18H3Z"/><circle cx="11" cy="18" r="3.6"/><circle cx="29" cy="18" r="3.6"/></g></symbol>
+  <symbol id="i-monitor" viewBox="0 0 44 38"><g fill="currentColor"><rect x="2" y="2" width="40" height="26" rx="3"/><rect x="18" y="28" width="8" height="5"/><rect x="11" y="33" width="22" height="3" rx="1.5"/></g><rect x="6" y="6" width="32" height="18" rx="1.5" fill="var(--card)"/></symbol>
+  <symbol id="i-bus" viewBox="0 0 44 24"><g fill="currentColor"><rect x="2" y="2" width="40" height="17" rx="4"/><circle cx="11" cy="20" r="3.4"/><circle cx="33" cy="20" r="3.4"/></g><g fill="var(--card)"><rect x="6" y="5" width="7" height="6" rx="1"/><rect x="16" y="5" width="7" height="6" rx="1"/><rect x="26" y="5" width="7" height="6" rx="1"/><rect x="35" y="5" width="4" height="10" rx="1"/></g></symbol>
+  <symbol id="i-sat" viewBox="0 0 40 40"><g fill="currentColor"><rect x="15" y="15" width="10" height="10" rx="2"/><rect x="1" y="17" width="12" height="6"/><rect x="27" y="17" width="12" height="6"/></g></symbol>
+  <symbol id="i-building" viewBox="0 0 30 60"><rect x="1" y="1" width="28" height="58" fill="currentColor"/><g fill="var(--card)" opacity=".55"><rect x="5" y="6" width="6" height="6"/><rect x="19" y="6" width="6" height="6"/><rect x="5" y="18" width="6" height="6"/><rect x="19" y="18" width="6" height="6"/><rect x="5" y="30" width="6" height="6"/><rect x="19" y="30" width="6" height="6"/><rect x="5" y="42" width="6" height="6"/><rect x="19" y="42" width="6" height="6"/></g></symbol>
+  <symbol id="i-tree" viewBox="0 0 30 40"><circle cx="15" cy="14" r="13" fill="currentColor"/><rect x="12" y="24" width="6" height="16" fill="currentColor" opacity=".7"/></symbol>
+</defs>
+</svg>
+
+<nav class="top"><div class="wrap" id="navwrap">
+  <a href="#top">開頭</a><a href="#method">研究方法</a><a href="#market">RQ1 市場</a><a href="#platform">RQ2 機型</a><a href="#tech">RQ2 技術</a><a href="#apps">RQ3 應用</a><a href="#models">模型比較</a><a href="#challenges">RQ4 挑戰</a><a href="#edge">邊緣運算</a><a href="#future">未來方向</a><a href="#wrapup">總結</a>
+  <button id="themeBtn" type="button">◐ 深淺</button>
+</div></nav>
+
+<div class="wrap">
+<header class="hero" id="top">
+  <div class="kicker">論文圖解 · IEEE Access 2025 · Kumar 等人</div>
+  <h1>無人機智慧監控的崛起<br><span class="muted" style="font-weight:700;font-size:.62em">The Rise of UAV-Based Smart Surveillance：趨勢與技術的系統性回顧</span></h1>
+  <p class="lead">一句話：這篇<b>不是發明新技術</b>，而是把 2020–2025 年的 <b>97 篇</b>研究整理起來，回答「無人機監控」的 4 個問題。</p>
+
+  <div class="grid g4" style="margin-top:20px">
+    <a class="card rq" href="#market"><div class="n">RQ1</div><b>市場多大？</b><div class="small muted">規模、成長率、地區、誰在買</div></a>
+    <a class="card rq" href="#platform"><div class="n">RQ2</div><b>用哪種無人機、什麼技術？</b><div class="small muted">5 種機型＋AI、感測器、通訊</div></a>
+    <a class="card rq" href="#apps"><div class="n">RQ3</div><b>用在哪裡？</b><div class="small muted">邊境、農業、軍事、城市</div></a>
+    <a class="card rq" href="#challenges"><div class="n">RQ4</div><b>卡在哪？未來往哪走？</b><div class="small muted">電池、群飛、網路、資安、算力…</div></a>
+  </div>
+
+  <div class="fig">
+    <div class="fig-h"><span class="tag anim">動畫</span>先建立全貌：一台監控無人機怎麼運作</div>
+    <div class="sv"><svg viewBox="0 0 820 250" id="overview">
+      <g class="ts" text-anchor="middle">
+        <text x="100" y="22" class="fR">⚠ 夜間、天候</text><text x="300" y="22" class="fR">⚠ 算力有限</text><text x="500" y="22" class="fR">⚠ 斷線、駭客</text><text x="700" y="22" class="fR">⚠ 隱私、法規</text>
+      </g>
+      <g>
+        <circle cx="100" cy="88" r="44" class="nd"/><use href="#i-cam" x="78" y="72" width="44" height="32" class="cB"/>
+        <circle cx="300" cy="88" r="44" class="nd"/><use href="#i-chip" x="280" y="68" width="40" height="40" class="cP"/>
+        <circle cx="500" cy="88" r="44" class="nd"/><use href="#i-tower" x="480" y="64" width="40" height="48" class="cT"/>
+        <circle cx="700" cy="88" r="44" class="nd"/><use href="#i-monitor" x="678" y="69" width="44" height="38" class="cO"/>
+      </g>
+      <g class="ln" marker-end="url(#ah)"><path d="M146 88H252"/><path d="M346 88H452"/><path d="M546 88H652"/></g>
+      <g class="fB"><circle r="4"><animateMotion dur="1.4s" repeatCount="indefinite" path="M146 88H250"/></circle>
+        <circle r="4"><animateMotion dur="1.4s" begin=".45s" repeatCount="indefinite" path="M346 88H450"/></circle>
+        <circle r="4"><animateMotion dur="1.4s" begin=".9s" repeatCount="indefinite" path="M546 88H650"/></circle></g>
+      <g text-anchor="middle">
+        <text x="100" y="154" class="tb">看</text><text x="300" y="154" class="tb">想</text><text x="500" y="154" class="tb">傳</text><text x="700" y="154" class="tb">決策</text>
+        <text x="100" y="174" class="ts">相機・熱像・LiDAR</text><text x="300" y="174" class="ts">機上 AI 偵測/追蹤</text><text x="500" y="174" class="ts">5G・網狀網路</text><text x="700" y="174" class="ts">指揮中心派人/警報</text>
+      </g>
+      <rect x="56" y="200" width="688" height="18" rx="9" class="fGs"/>
+      <rect x="56" y="200" width="688" height="18" rx="9" class="fG" opacity=".55"><animate attributeName="width" values="688;140;688" dur="6s" repeatCount="indefinite"/></rect>
+      <text x="400" y="240" text-anchor="middle" class="ts">🔋 以上全部都吃同一顆電池 —— 這是全篇反覆出現的最大瓶頸</text>
+    </svg></div>
+    <p class="cap">後面每一章，其實都在講這條鏈上的某一段：用什麼「看」、怎麼「想」得又快又準、怎麼「傳」得穩又安全，以及電池撐不撐得住。</p>
+  </div>
+</header>
+
+<!-- ===================== METHOD ===================== -->
+<section id="method">
+  <div class="kicker">研究方法</div>
+  <h2>他們怎麼挑出這 97 篇？</h2>
+  <p><b>系統性回顧</b>＝照一套事先公開的規則去找論文、刪論文，避免「只挑自己喜歡的」。這套規則叫 <b>PRISMA</b>：先「找」、再「篩」、最後「納入」。</p>
+
+  <div class="grid g2">
+  <div class="fig" style="margin:8px 0">
+    <div class="fig-h"><span class="tag flow">流程</span>第 1 步：用關鍵字搜尋（AND 取交集）</div>
+    <div class="sv narrow"><svg viewBox="0 0 420 190">
+      <defs><clipPath id="vennL"><circle cx="160" cy="90" r="72"/></clipPath></defs>
+      <circle cx="160" cy="90" r="72" class="fB" opacity=".14"/><circle cx="260" cy="90" r="72" class="fO" opacity=".14"/>
+      <circle cx="260" cy="90" r="72" class="fG" opacity=".55" clip-path="url(#vennL)"><animate attributeName="opacity" values=".25;.7;.25" dur="2.4s" repeatCount="indefinite"/></circle>
+      <circle cx="160" cy="90" r="72" fill="none" class="sB" stroke-width="1.5"/><circle cx="260" cy="90" r="72" fill="none" class="sO" stroke-width="1.5"/>
+      <text x="120" y="70" text-anchor="middle" class="tb fB">無人機</text>
+      <text x="120" y="90" text-anchor="middle" class="ts">UAV・drone</text><text x="120" y="104" text-anchor="middle" class="ts">aerial system</text>
+      <text x="300" y="70" text-anchor="middle" class="tb fO">監控</text>
+      <text x="300" y="90" text-anchor="middle" class="ts">surveillance</text><text x="300" y="104" text-anchor="middle" class="ts">…市場/技術/應用</text>
+      <text x="210" y="95" text-anchor="middle" class="tb">AND</text>
+      <text x="210" y="182" text-anchor="middle" class="ts">兩邊都提到的論文才算 · 2020/01–2025/03 · 4 個資料庫</text>
+    </svg></div>
+  </div>
+  <div class="card" style="margin:8px 0;align-self:center">
+    <h4>規則重點</h4>
+    <ul class="tight small">
+      <li>只在<b>標題、摘要、關鍵字</b>裡搜尋</li>
+      <li>資料庫：Scopus、Web of Science、IEEE Xplore、ScienceDirect</li>
+      <li>用 Mendeley 依標題、作者、DOI 自動抓重複，再人工確認</li>
+      <li>刪除理由：沒全文、不是講無人機監控、方法交代不清、<b>純模擬</b></li>
+      <li>2020 年以前的經典論文只用來講歷史，<b>不算</b>在 97 篇裡</li>
+    </ul>
+  </div>
+  </div>
+
+  <div class="fig" id="prismaFig">
+    <div class="fig-h"><span class="tag anim">動畫</span>第 2 步：170 → 97，每一顆點＝一篇論文</div>
+    <div class="sv"><svg viewBox="0 0 820 400" id="prisma"></svg></div>
+    <div class="ctrl"><button class="pri" id="prismaBtn">▶ 播放</button><span class="cap" id="prismaCap">按播放，看論文怎麼被一層層篩掉</span></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const svg=document.getElementById('prisma');
+  const srcs=[{n:'Scopus',c:55,col:'var(--blue)'},{n:'Web of Science',c:44,col:'var(--purple)'},{n:'IEEE Xplore',c:32,col:'var(--teal)'},{n:'ScienceDirect',c:39,col:'var(--orange)'}];
+  const dots=[];let y=26;
+  srcs.forEach(s=>{T(svg,20,y,s.n+'  '+s.c+' 篇','tx');y+=12;for(let i=0;i<s.c;i++)dots.push({sx:26+(i%11)*10,sy:y+Math.floor(i/11)*10,col:s.col});y+=Math.ceil(s.c/11)*10+16;});
+  T(svg,300,30,'合併在一起','ts');
+  const bigNum=T(svg,330,300,'','tbig',{'text-anchor':'middle'});
+  const bins=[{label:'重複',y:34,n:35,col:'var(--red)'},{label:'沒有全文',y:110,n:18,col:'var(--muted)'},{label:'品質不合格',y:162,n:20,col:'var(--orange)'},{label:'✔ 最終納入',y:222,n:97,col:'var(--green)'}];
+  const binTxt=bins.map(b=>{const t=T(svg,560,b.y,'','tx');return t;});
+  const binCnt=bins.map(b=>T(svg,800,b.y,'','tb',{'text-anchor':'end'}));
+  // stage bar
+  const stages=['辨識','篩選','納入'];const stEls=[];
+  stages.forEach((s,i)=>{const x=250+i*120;const r=S('rect',{x:x,y:352,width:90,height:30,rx:15,class:'nd'},svg);const t=T(svg,x+45,372,s,'tx',{'text-anchor':'middle'});stEls.push(r);if(i<2)S('path',{d:`M${x+94} 367H${x+116}`,class:'ln','marker-end':'url(#ah)'},svg);});
+  const pool=i=>[270+(i%15)*11,48+Math.floor(i/15)*11+0];
+  const binPos=(b,k)=>[566+(k%10)*10,bins[b].y+12+Math.floor(k/10)*10];
+  dots.forEach(d=>{d.el=S('circle',{cx:0,cy:0,r:3.6,class:'dot'},svg);});
+  const r=rng(7);const order=dots.map((_,i)=>i);for(let i=order.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+  function place(d,p,col,delay){d.el.style.transitionDelay=(delay||0)+'ms';d.el.style.transform=`translate(${p[0]}px,${p[1]}px)`;d.el.style.fill=col;}
+  function setStage(i){stEls.forEach((e,k)=>e.classList.toggle('on-node',k===i));}
+  const cap=document.getElementById('prismaCap');
+  function reset(){dots.forEach(d=>{d.el.style.transition='none';place(d,[d.sx,d.sy],d.col,0);});svg.getBoundingClientRect();dots.forEach(d=>d.el.style.transition='');bigNum.textContent='';binTxt.forEach(t=>t.textContent='');binCnt.forEach(t=>t.textContent='');setStage(-1);}
+  async function count(a,b){await tween(900,t=>bigNum.textContent=Math.round(a+(b-a)*t)+' 篇');}
+  reset();
+  const go=player(document.getElementById('prismaBtn'),async W=>{
+    reset();cap.innerHTML='① 4 個資料庫一共搜到 <b>170 篇</b>（顏色＝來源）';setStage(0);await W(1200);
+    dots.forEach((d,i)=>place(d,pool(i),'var(--muted)',i*4));bigNum.textContent='170 篇';await W(1700);
+    const groups=[order.slice(0,35),order.slice(35,53),order.slice(53,73),order.slice(73)];
+    const caps=['② 去重：同一篇在不同資料庫重複出現 → 刪 <b>35</b> 篇，剩 135','③ 篩選：找不到全文 → 刪 <b>18</b> 篇','④ 品質評估：離題、方法交代不清、純模擬 → 刪 <b>20</b> 篇','⑤ 剩下的 <b>97 篇</b>就是本文分析的全部資料'];
+    let left=170;
+    for(let b=0;b<4;b++){
+      cap.innerHTML=caps[b];setStage(b===0?0:b<3?1:2);binTxt[b].textContent=bins[b].label;
+      groups[b].forEach((di,k)=>place(dots[di],binPos(b,k),bins[b].col,k*(b===3?8:18)));
+      if(b<3){const nl=left-bins[b].n;count(left,nl);left=nl;binCnt[b].textContent='−'+bins[b].n;}else{binCnt[b].textContent='97';}
+      await W(b===3?1800:1600);
+    }
+  });
+  onVisible(document.getElementById('prismaFig'),go,.4);
+})();
+</script>
+
+<!-- ===================== MARKET ===================== -->
+<section id="market">
+  <div class="kicker">RQ1 · 市場</div>
+  <h2>市場有多大？長多快？</h2>
+  <div class="grid g4">
+    <div class="card"><div class="stat">$141 億<small> 美元</small></div><div class="small muted">2023 年全球無人機監控市場</div></div>
+    <div class="card"><div class="stat">$472 億<small> 美元</small></div><div class="small muted">預估 2032 年</div></div>
+    <div class="card"><div class="stat">13.15%<small> / 年</small></div><div class="small muted">年複合成長率 CAGR</div></div>
+    <div class="card"><div class="stat">60%<small> 軍事</small></div><div class="small muted">需求最大宗是國防</div></div>
+  </div>
+
+  <div class="fig" id="cagrFig">
+    <div class="fig-h"><span class="tag anim">動畫</span><span class="tag int">互動</span>CAGR 公式：其實就是「每年乘一次 (1+r)」</div>
+    <div class="sv"><svg viewBox="0 0 820 330" id="cagr"></svg></div>
+    <div class="ctrl">
+      <button class="pri" id="cagrBtn">▶ 播放</button>
+      <label>年成長率 r <input type="range" id="cagrR" min="5" max="20" step="0.05" value="13.15"><b id="cagrRv">13.15%</b></label>
+    </div>
+    <p class="cap" id="cagrEq"></p>
+  </div>
+  <div class="key warn small"><b>細心讀者會發現：</b>照論文給的 13.15% 從 2024 年的 160.7 億算 8 年，只會到約 <b>432 億</b>；要到論文寫的 471.6 億，r 其實要約 <b>14.4%</b>（把滑桿拉到 14.4 看看）。數字有小出入，但結論不變：<b>大約 8–9 年翻 3 倍</b>。</div>
+
+  <h3>為什麼長這麼快？</h3>
+  <div class="fig">
+    <div class="fig-h"><span class="tag flow">流程</span>三股力量匯成需求</div>
+    <div class="sv"><svg viewBox="0 0 820 200">
+      <g>
+        <circle cx="60" cy="40" r="24" class="fRs"/><path d="M60 24l13 5v10c0 9-6 15-13 18c-7-3-13-9-13-18V29z" class="fR"/>
+        <circle cx="60" cy="100" r="24" class="fGs"/><circle cx="60" cy="100" r="13" class="fG"/><text x="60" y="105" text-anchor="middle" style="fill:var(--card);font-weight:900;font-size:14px">$</text>
+        <circle cx="60" cy="160" r="24" class="fPs"/><use href="#i-chip" x="44" y="144" width="32" height="32" class="cP"/>
+        <text x="96" y="37" class="tb">安全威脅升高</text><text x="96" y="55" class="ts">地緣衝突、在地治安</text>
+        <text x="96" y="97" class="tb">比直升機便宜</text><text x="96" y="115" class="ts">同樣任務成本低很多</text>
+        <text x="96" y="157" class="tb">AI＋自主飛行成熟</text><text x="96" y="175" class="ts">會自己看、自己飛、飛更久</text>
+      </g>
+      <g class="ln"><path id="dr1" d="M250 40C420 40 430 100 560 100"/><path id="dr2" d="M250 100H560"/><path id="dr3" d="M250 160C420 160 430 100 560 100"/></g>
+      <g><circle r="5" class="fR"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#dr1"/></animateMotion></circle>
+         <circle r="5" class="fG"><animateMotion dur="2s" begin=".6s" repeatCount="indefinite"><mpath href="#dr2"/></animateMotion></circle>
+         <circle r="5" class="fP"><animateMotion dur="2s" begin="1.2s" repeatCount="indefinite"><mpath href="#dr3"/></animateMotion></circle></g>
+      <circle cx="604" cy="100" r="42" class="nd"/><text x="604" y="96" text-anchor="middle" class="tb">需求</text><text x="604" y="116" text-anchor="middle" class="tb fB">↑↑</text>
+      <path d="M648 100H700" class="ln" marker-end="url(#ah)"/>
+      <text x="712" y="96" class="tb">市場</text><text x="712" y="116" class="tb fG">×3</text>
+    </svg></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="fig" style="margin:0">
+      <div class="fig-h">誰在買？（市場區隔）</div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <svg viewBox="0 0 160 160" width="150" height="150" id="donut">
+          <circle cx="80" cy="80" r="56" fill="none" stroke="var(--soft)" stroke-width="24"/>
+          <circle id="donutSeg" cx="80" cy="80" r="56" fill="none" stroke="var(--red)" stroke-width="24" stroke-dasharray="0 352" transform="rotate(-90 80 80)" style="transition:stroke-dasharray 1.4s ease"/>
+          <text x="80" y="78" text-anchor="middle" class="tbig">60%</text><text x="80" y="98" text-anchor="middle" class="ts">軍事國防</text>
+        </svg>
+        <div class="small" style="flex:1;min-width:160px">
+          <div><b style="color:var(--red)">■ 軍事國防 60%</b>：偵察、反恐、戰場即時情報</div>
+          <div class="muted">■ 其他 40%：</div>
+          <div>・商業：基礎設施巡檢、城市、工安（成長最快）</div>
+          <div>・公共安全：救災、搜救、疫情追蹤</div>
+        </div>
+      </div>
+    </div>
+    <div class="fig" style="margin:0">
+      <div class="fig-h">各地區在幹嘛？</div>
+      <table class="t">
+        <tr><td><b>北美</b></td><td><b style="color:var(--blue)">&gt; 35%，最大</b><br><span class="muted small">國防預算高、智慧城市、法規嚴</span></td></tr>
+        <tr><td><b>歐洲</b></td><td class="small">邊境安全、環境監測、永續科技</td></tr>
+        <tr><td><b>亞太</b></td><td class="small">成長最快：印度、中國用在城市發展、救災、邊境</td></tr>
+        <tr><td><b>中東非洲</b></td><td class="small">保護油氣設施等關鍵基礎設施</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const svg=document.getElementById('cagr');
+  const years=[2023,2024,2025,2026,2027,2028,2029,2030,2031,2032];
+  const X0=70,X1=800,Y0=270,Y1=30,maxV=60;const bw=46,step=(X1-X0)/years.length;
+  const yv=v=>Y0-(v/maxV)*(Y0-Y1);
+  for(let g=0;g<=60;g+=10){S('line',{x1:X0-10,x2:X1,y1:yv(g),y2:yv(g),stroke:'var(--line)','stroke-width':g?0.8:1.4},svg);T(svg,X0-16,yv(g)+4,g?g*10+'億':'0','ts',{'text-anchor':'end'});}
+  const bars=[],labs=[],arcs=[],arcT=[];
+  years.forEach((yr,i)=>{const x=X0+i*step+(step-bw)/2;bars.push(S('rect',{x,y:Y0,width:bw,height:0,rx:5,class:i===0?'fM':i===1?'fB':'fB',opacity:i<2?1:.7},svg));labs.push(T(svg,x+bw/2,Y0,'','ts',{'text-anchor':'middle'}));T(svg,x+bw/2,Y0+18,yr,'ts',{'text-anchor':'middle'});});
+  for(let i=1;i<years.length-1;i++){const a=S('path',{class:'ln',stroke:'var(--orange)','marker-end':'url(#ahO)',opacity:0},svg);arcs.push(a);arcT.push(T(svg,0,0,'×(1+r)','ts',{'text-anchor':'middle',opacity:0,fill:'var(--orange)'}));}
+  const xi=i=>X0+i*step+step/2;
+  const pm=S('g',{},svg);const pmy=yv(47.16);S('line',{x1:xi(9)-30,x2:xi(9)+30,y1:pmy,y2:pmy,stroke:'var(--red)','stroke-width':2,'stroke-dasharray':'4 3'},pm);T(pm,xi(9)-34,pmy+4,'論文寫 471.6 億','ts',{'text-anchor':'end',fill:'var(--red)'});
+  T(svg,X0-40,18,'單位：美元','ts');
+  const rIn=document.getElementById('cagrR'),rV=document.getElementById('cagrRv'),eq=document.getElementById('cagrEq');
+  let shown=0;
+  function vals(r){return years.map(y=>y===2023?14.14:16.07*Math.pow(1+r,y-2024));}
+  function draw(prog){ // prog: number of bars shown (float)
+    const r=rIn.value/100;const v=vals(r);
+    v.forEach((val,i)=>{const k=Math.max(0,Math.min(1,prog-i));const h=(Y0-yv(val))*k;bars[i].setAttribute('y',Y0-h);bars[i].setAttribute('height',h);labs[i].setAttribute('y',Y0-h-6);labs[i].textContent=k>0.98?(val*10).toFixed(0):'';});
+    arcs.forEach((a,j)=>{const i=j+1;const x1=xi(i),x2=xi(i+1),y1=yv(v[i])-20,y2=yv(v[i+1])-20;a.setAttribute('d',`M${x1} ${y1}Q${(x1+x2)/2} ${Math.min(y1,y2)-26} ${x2-4} ${y2-2}`);const on=prog>i+1.5?1:0;a.setAttribute('opacity',on);arcT[j].setAttribute('x',(x1+x2)/2);arcT[j].setAttribute('y',Math.min(y1,y2)-22);arcT[j].setAttribute('opacity',on&&j%2===0?1:0);});
+    const end=v[9];const dbl=Math.log(2)/Math.log(1+r);
+    rV.textContent=(+rIn.value).toFixed(2)+'%';
+    eq.innerHTML=`終值 = 起值 × (1 + r)<sup>年數</sup> → 2032 = 160.7 億 × (1 + ${(r).toFixed(4)})<sup>8</sup> = <b>${(end*10).toFixed(0)} 億</b>　｜　每 <b>${dbl.toFixed(1)}</b> 年翻一倍`;
+  }
+  draw(0);
+  rIn.addEventListener('input',()=>{shown=10;draw(10);});
+  const go=player(document.getElementById('cagrBtn'),async W=>{await tween(3200,t=>draw(t*10),t=>t);shown=10;});
+  onVisible(document.getElementById('cagrFig'),go,.4);
+  onVisible(document.getElementById('donut'),()=>document.getElementById('donutSeg').setAttribute('stroke-dasharray',(0.6*2*Math.PI*56).toFixed(1)+' 352'));
+})();
+</script>
+
+
+<!-- ===================== PLATFORM ===================== -->
+<style>
+.wingL{animation:flapU .45s ease-in-out infinite;transform-box:fill-box;transform-origin:100% 50%}
+.wingR{animation:flapD .45s ease-in-out infinite;transform-box:fill-box;transform-origin:0% 50%}
+</style>
+<section id="platform">
+  <div class="kicker">RQ2 · 機型</div>
+  <h2>5 種監控無人機：各有絕活，也各有罩門</h2>
+  <p>選機型的核心只有一個取捨：<b class="hl">「能停在空中」vs「能飛得久又遠」</b>。旋翼能停但耗電，固定翼省電但停不下來，其他三種是在這兩者之間找出路。</p>
+
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card drone-card">
+      <svg viewBox="0 0 200 120"><g class="ground"><path d="M0 106H260" stroke="var(--line)" stroke-width="2"/><path d="M10 106v6M50 106v6M90 106v6M130 106v6M170 106v6M210 106v6M250 106v6" stroke="var(--line)" stroke-width="2"/></g>
+        <g transform="translate(100,55)"><g class="bob"><ellipse cx="0" cy="0" rx="40" ry="6.5" class="fB"/><path d="M-36 -3L-27 -3L-36 -20L-41 -20Z" class="fB"/><ellipse cx="2" cy="-1" rx="14" ry="3.2" class="fF" opacity=".55"/><ellipse cx="42" cy="0" rx="1.6" ry="9" class="fF spin"/></g></g>
+        <text x="100" y="98" text-anchor="middle" class="ts">一直往前，停不下來</text></svg>
+      <h4 style="margin-top:8px">固定翼 <span class="ref">像小飛機</span></h4>
+      <div class="small"><span class="pro">✔</span> 飛最久、最遠、最快<br><span class="con">✘</span> 要跑道或彈射；不能懸停</div>
+      <div style="margin-top:6px"><span class="chip">軍事偵察</span><span class="chip">大範圍邊境巡邏</span><span class="chip">環境監測</span></div>
+    </div>
+    <div class="card drone-card">
+      <svg viewBox="0 0 200 120"><path d="M0 106H200" stroke="var(--line)" stroke-width="2"/>
+        <path d="M100 58L70 106H130Z" class="fA" opacity=".18"/>
+        <g transform="translate(100,48)"><g class="bob"><line x1="-34" y1="0" x2="34" y2="0" stroke="var(--teal)" stroke-width="4"/><rect x="-12" y="-6" width="24" height="14" rx="5" class="fT"/>
+          <line x1="-34" y1="-8" x2="-34" y2="0" stroke="var(--teal)" stroke-width="3"/><line x1="34" y1="-8" x2="34" y2="0" stroke="var(--teal)" stroke-width="3"/>
+          <ellipse cx="-34" cy="-9" rx="16" ry="3" class="fT spin" opacity=".7"/><ellipse cx="34" cy="-9" rx="16" ry="3" class="fT spin" opacity=".7"/><circle cx="0" cy="10" r="4" class="fF"/></g></g>
+        <text x="100" y="22" text-anchor="middle" class="ts">定點懸停盯著看</text></svg>
+      <h4 style="margin-top:8px">旋翼 <span class="ref">四軸、多軸、單旋翼（直升機型）</span></h4>
+      <div class="small"><span class="pro">✔</span> 能懸停、垂直起降、好操控<br><span class="con">✘</span> 耗電飛不久；單旋翼機構複雜又吵</div>
+      <div style="margin-top:6px"><span class="chip">城市監控</span><span class="chip">犯罪現場</span><span class="chip">搜救</span><span class="chip">執法</span></div>
+    </div>
+    <div class="card drone-card">
+      <svg viewBox="0 0 200 120"><path d="M0 106H200" stroke="var(--line)" stroke-width="2"/>
+        <g transform="translate(30,96)"><g class="vtol"><ellipse cx="0" cy="0" rx="22" ry="4.5" class="fP"/><path d="M-20 -2L-14 -2L-21 -13L-24 -13Z" class="fP"/>
+          <line x1="-12" y1="-6" x2="12" y2="-6" stroke="var(--purple)" stroke-width="2"/><ellipse cx="-12" cy="-8" rx="7" ry="1.6" class="fP spin"/><ellipse cx="12" cy="-8" rx="7" ry="1.6" class="fP spin"/></g></g>
+        <text x="40" y="22" class="ts">① 垂直升空 → ② 轉成平飛</text></svg>
+      <h4 style="margin-top:8px">混合型 VTOL <span class="ref">傾轉旋翼、四旋翼＋機翼</span></h4>
+      <div class="small"><span class="pro">✔</span> 原地起降＋長程飛行，兩者兼得<br><span class="con">✘</span> 機構複雜、較貴、較重</div>
+      <div style="margin-top:6px"><span class="chip">長程偵察</span><span class="chip">管線巡檢</span><span class="chip">災後評估</span></div>
+    </div>
+    <div class="card drone-card">
+      <svg viewBox="0 0 200 120"><path d="M0 106H200" stroke="var(--line)" stroke-width="2"/>
+        <g stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round"><path class="wind" d="M0 30h26"/><path class="wind" style="animation-delay:.8s" d="M0 74h20"/><path class="wind" style="animation-delay:1.6s" d="M0 52h30"/></g>
+        <g transform="translate(96,50)"><g class="sway"><ellipse cx="0" cy="0" rx="50" ry="19" class="fO" opacity=".85"/><path d="M-44 -4L-62 -16L-58 0L-62 16L-44 4Z" class="fO"/><rect x="-10" y="18" width="20" height="8" rx="2" class="fF" opacity=".7"/><line x1="-6" y1="14" x2="-6" y2="19" stroke="var(--fg)"/><line x1="6" y1="14" x2="6" y2="19" stroke="var(--fg)"/></g></g>
+        <text x="100" y="100" text-anchor="middle" class="ts">靠氦氣浮著，風一吹就飄</text></svg>
+      <h4 style="margin-top:8px">輕於空氣 <span class="ref">飛艇、繫留氣球</span></h4>
+      <div class="small"><span class="pro">✔</span> 超安靜、滯空極久、營運便宜<br><span class="con">✘</span> 很慢、怕風、受天氣影響</div>
+      <div style="margin-top:6px"><span class="chip">活動監控</span><span class="chip">定點長期監視</span><span class="chip">災區通訊中繼</span></div>
+    </div>
+    <div class="card drone-card">
+      <svg viewBox="0 0 200 120"><path d="M0 106H200" stroke="var(--line)" stroke-width="2"/>
+        <g transform="translate(100,56)"><g class="bob"><path class="wingL fG" d="M-52 -4Q-26 -14 0 -2L0 4Q-26 2 -52 -4Z"/><path class="wingR fG" d="M52 -4Q26 -14 0 -2L0 4Q26 2 52 -4Z"/><ellipse cx="0" cy="2" rx="6" ry="10" class="fF"/><circle cx="0" cy="-9" r="4" class="fF"/></g></g>
+        <text x="100" y="98" text-anchor="middle" class="ts">外型像鳥，不容易被發現</text></svg>
+      <h4 style="margin-top:8px">撲翼 <span class="ref">仿鳥、仿昆蟲</span></h4>
+      <div class="small"><span class="pro">✔</span> 極度隱密，可鑽狹窄空間<br><span class="con">✘</span> 載重小；兼顧效率與穩定很難</div>
+      <div style="margin-top:6px"><span class="chip">祕密監視</span><span class="chip">野生動物研究</span></div>
+    </div>
+    <div class="card">
+      <h4>一眼比較 <span class="ref">依論文表 1 文字整理的相對程度</span></h4>
+      <table class="t small" id="rateTbl"></table>
+    </div>
+  </div>
+
+  <div class="fig" id="treeFig">
+    <div class="fig-h"><span class="tag int">互動</span><span class="tag flow">流程</span>選機型決策樹：回答問題，看會走到哪</div>
+    <div class="sv"><svg viewBox="0 0 820 260" id="tree"></svg></div>
+    <div class="ctrl"><button id="tYes" class="pri">是</button><button id="tNo" class="pri">否</button><button id="tReset">重來</button><span class="cap" id="tCap"></span></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const rows=[['續航','1','3','2','3','1'],['懸停','3','0','3','3','1'],['遠距效率','1','3','3','1','1'],['安靜隱密','1','2','1','3','3'],['便宜好用','2','2','1','3','1']];
+  const tb=document.getElementById('rateTbl');
+  tb.innerHTML='<tr><th></th><th>旋翼</th><th>固定翼</th><th>混合</th><th>輕於<br>空氣</th><th>撲翼</th></tr>'+rows.map(r=>'<tr><td>'+r[0]+'</td>'+r.slice(1).map(v=>'<td class="rate">'+[0,1,2].map(k=>'<i'+(k<+v?' class="f"':'')+'></i>').join('')+'</td>').join('')+'</tr>').join('');
+})();
+(function(){
+  const svg=document.getElementById('tree');
+  const N={
+    q1:{x:80,y:60,t:'要停在空中盯著看？',yes:'q2',no:'L1'},
+    q2:{x:255,y:60,t:'也要飛很遠？',yes:'L2',no:'q3'},
+    q3:{x:430,y:60,t:'要掛很久、慢也行？',yes:'L3',no:'q4'},
+    q4:{x:605,y:60,t:'要偽裝、鑽窄處？',yes:'L4',no:'L5'},
+    L1:{x:80,y:190,t:'固定翼',s:'飛得久又遠',leaf:1,why:'不需要懸停 → 固定翼最省電、航程最長，適合大範圍巡邏。'},
+    L2:{x:255,y:190,t:'混合型 VTOL',s:'原地起降＋長程',leaf:1,why:'既要懸停又要飛遠 → 混合型，代價是貴、機構複雜。'},
+    L3:{x:430,y:190,t:'輕於空氣',s:'安靜、超長滯空',leaf:1,why:'要長時間掛在同一處 → 飛艇／氣球，幾乎不耗電，但怕風。'},
+    L4:{x:605,y:190,t:'撲翼',s:'像鳥，難被發現',leaf:1,why:'需要隱密 → 撲翼，但載重很小。'},
+    L5:{x:768,y:60,t:'旋翼',s:'最萬用',leaf:1,why:'一般懸停監控 → 旋翼（四軸）最常見，城市監控主力。'}};
+  const E=[['q1','q2','是'],['q2','q3','否'],['q3','q4','否'],['q4','L5','否'],['q1','L1','否'],['q2','L2','是'],['q3','L3','是'],['q4','L4','是']];
+  const edgeEl={},nodeEl={};
+  E.forEach(([a,b,l])=>{const A=N[a],B=N[b];let d;if(A.y===B.y)d=`M${A.x+68} ${A.y}H${B.x-(B.leaf?47:68)}`;else d=`M${A.x} ${A.y+22}V${B.y-28}`;
+    edgeEl[a+b]=S('path',{d,class:'ln','marker-end':'url(#ah)'},svg);
+    if(A.y===B.y)T(svg,(A.x+68+B.x-(B.leaf?47:68))/2,A.y-9,l,'ts',{'text-anchor':'middle'});else T(svg,A.x+8,(A.y+B.y)/2+4,l,'ts');});
+  for(const k in N){const n=N[k];const g=S('g',{},svg);
+    if(n.leaf){const w=k==='L5'?92:128;nodeEl[k]=S('rect',{x:n.x-w/2,y:n.y-28,width:w,height:56,rx:28,class:'nd'},g);T(g,n.x,n.y-3,n.t,'tb',{'text-anchor':'middle'});T(g,n.x,n.y+15,n.s,'ts',{'text-anchor':'middle'});}
+    else{nodeEl[k]=S('rect',{x:n.x-68,y:n.y-22,width:136,height:44,rx:8,class:'nd'},g);T(g,n.x,n.y+5,n.t,'tx',{'text-anchor':'middle'});}}
+  const cap=document.getElementById('tCap');let cur='q1',path=[];
+  function render(){for(const k in nodeEl)nodeEl[k].classList.toggle('on-node',k===cur||path.includes(k));for(const k in edgeEl)edgeEl[k].classList.toggle('on-path',false);for(let i=0;i<path.length-1;i++){const e=edgeEl[path[i]+path[i+1]];if(e)e.classList.add('on-path');}const c=N[cur];cap.innerHTML=c.leaf?'👉 <b>'+c.t+'</b>：'+c.why:'問題：<b>'+c.t+'</b>';}
+  function ans(y){const c=N[cur];if(c.leaf)return;const nx=y?c.yes:c.no;path.push(nx);cur=nx;render();}
+  document.getElementById('tYes').onclick=()=>ans(true);document.getElementById('tNo').onclick=()=>ans(false);
+  document.getElementById('tReset').onclick=()=>{cur='q1';path=['q1'];render();};
+  path=['q1'];render();
+})();
+</script>
+
+<!-- ===================== TECH ===================== -->
+<section id="tech">
+  <div class="kicker">RQ2 · 關鍵技術</div>
+  <h2>讓無人機「變聰明」的技術</h2>
+  <p>最大的轉變只有一個：<b class="hl">AI 從雲端搬到無人機身上</b>（邊緣運算）。其餘技術都是在解決「機上算力很小」這件事——要追得準、又要跑得動。</p>
+
+  <div class="fig" id="edgeCloudFig">
+    <div class="fig-h"><span class="tag anim">動畫</span>上雲處理 vs 機上處理</div>
+    <div class="sv"><svg viewBox="0 0 820 250">
+      <text x="14" y="26" class="tb">傳統：原始影片全部丟上雲</text>
+      <use href="#i-quad" x="40" y="62" width="64" height="38" class="cM"/>
+      <path d="M110 76H640" stroke="var(--soft)" stroke-width="10"/><path d="M640 98H110" class="lnd"/>
+      <use href="#i-cloud" x="644" y="52" width="70" height="44" class="cM"/><text x="679" y="114" text-anchor="middle" class="ts">雲端運算</text>
+      <g class="fO"><rect width="28" height="14" rx="2" y="-7" x="-14"><animateMotion dur="2.4s" repeatCount="indefinite" path="M110 76H630"/></rect><rect width="28" height="14" rx="2" y="-7" x="-14"><animateMotion dur="2.4s" begin=".6s" repeatCount="indefinite" path="M110 76H630"/></rect><rect width="28" height="14" rx="2" y="-7" x="-14"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M110 76H630"/></rect><rect width="28" height="14" rx="2" y="-7" x="-14"><animateMotion dur="2.4s" begin="1.8s" repeatCount="indefinite" path="M110 76H630"/></rect></g>
+      <circle r="4" class="fG"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M630 98H120"/></circle>
+      <text x="370" y="64" text-anchor="middle" class="ts">🎞 大量原始影片</text><text x="370" y="114" text-anchor="middle" class="ts">結果再傳回來</text>
+      <g class="ts" style="fill:var(--red)"><text x="736" y="62">延遲 高</text><text x="736" y="80">頻寬 吃緊</text><text x="736" y="98">隱私 易外洩</text></g>
+      <line x1="10" y1="138" x2="810" y2="138" stroke="var(--line)"/>
+      <text x="14" y="164" class="tb">現在：機上 AI 先看懂，只傳「結論」</text>
+      <use href="#i-quad" x="40" y="186" width="64" height="38" class="cB"/><use href="#i-chip" x="60" y="214" width="24" height="24" class="cP pulse"/>
+      <path d="M110 200H640" class="ln"/>
+      <use href="#i-tower" x="656" y="176" width="36" height="44" class="cT"/><text x="674" y="236" text-anchor="middle" class="ts">地面站</text>
+      <g><circle r="10" class="fG"><animateMotion dur="2.4s" repeatCount="indefinite" path="M110 200H630"/></circle><text text-anchor="middle" y="4" style="fill:#fff;font-size:11px;font-weight:700">!<animateMotion dur="2.4s" repeatCount="indefinite" path="M110 200H630"/></text></g>
+      <text x="370" y="190" text-anchor="middle" class="ts">⚠「3 號區有可疑人物」——幾個位元組</text>
+      <g class="ts" style="fill:var(--green)"><text x="736" y="186">延遲 低</text><text x="736" y="204">頻寬 省</text><text x="736" y="222">隱私 風險低</text></g>
+    </svg></div>
+    <p class="cap">機上 AI 也讓無人機能<b>自己反應</b>：跟著目標飛、自己閃障礙物，不必等地面下指令。搭配 5G、網狀網路傳遙測資料，以及可見光／熱像／多光譜／LiDAR／長焦鏡頭等小型感測器（例如 DJI Enterprise 系列）。</p>
+  </div>
+
+  <h3>論文整理的 11 項代表技術（表 2），依「要解決什麼問題」分 5 類</h3>
+  <div class="grid g3 small">
+    <div class="card"><b>① 找出異常</b><br>UAV-AdNet（無監督異常偵測）</div>
+    <div class="card"><b>② 鎖定並追蹤目標</b><br>SiamAPN++、YOLOv3-SPP＋DeepSORT、Deep Re-ID、ViT／AVTrack／CGTrack、SGLATrack</div>
+    <div class="card"><b>③ 抓到很小的無人機</b><br>光流＋時空資訊、OF-GPRN（日夜雙視覺）</div>
+    <div class="card"><b>④ 讓一群無人機分工</b><br>深度強化學習 PPO＋中央任務規劃</div>
+    <div class="card"><b>⑤ 通訊不被偷聽</b><br>量子金鑰分發 QKD</div>
+  </div>
+
+  <h3>① 異常偵測：只學「正常長怎樣」</h3>
+  <p>現實中「壞事」的影片很少，沒辦法一一標註。UAV-AdNet 的做法是<b>無監督</b>：只看大量正常空拍，學出「正常的範圍」；之後任何落在範圍外的畫面就是異常。（軍事章節的 GoogLeNet＋單類 SVM 也是同一個想法。）</p>
+  <div class="fig" id="anomFig">
+    <div class="fig-h"><span class="tag anim">動畫</span>影像 → 特徵點 → 在不在「正常圈」裡？</div>
+    <div class="sv"><svg viewBox="0 0 820 290" id="anom"></svg></div>
+    <div class="ctrl"><button class="pri" id="anomBtn">▶ 播放</button><span class="cap" id="anomCap"></span></div>
+  </div>
+
+  <h3>② 追蹤目標：孿生網路（SiamAPN++）</h3>
+  <p>第一幀框出目標當「樣板」，之後每一幀都問：<b>畫面裡哪裡最像樣板？</b>樣板和搜尋區用<b>同一套</b>網路轉成特徵（所以叫「孿生」），再逐位置比對相似度。SiamAPN++ 加了注意力機制，在機上有限算力下兼顧準度和速度。</p>
+  <div class="fig" id="siamFig">
+    <div class="fig-h"><span class="tag anim">動畫</span>拿樣板掃過整個畫面，越像越熱</div>
+    <div class="sv"><svg viewBox="0 0 820 300" id="siam"></svg></div>
+    <div class="ctrl"><button class="pri" id="siamBtn">▶ 播放</button><span class="cap" id="siamCap"></span></div>
+  </div>
+
+  <h3>② 多目標追蹤：偵測＋預測＋配對（YOLOv3-SPP＋DeepSORT、Deep Re-ID）</h3>
+  <p>要同時追很多目標，難點不是「框出來」，而是<b>讓每個目標一直保持同一個編號</b>。做法是每一幀跑一次 4 步循環；被遮住時靠「預測」撐著，重新出現時靠「外觀特徵」認回來。</p>
+  <div class="fig" id="motFig">
+    <div class="fig-h"><span class="tag anim">動畫</span><span class="tag flow">流程</span>每一幀都轉一圈</div>
+    <div class="sv"><svg viewBox="0 0 820 290" id="mot"></svg></div>
+    <p class="cap">偵測＝YOLO 框出物體；預測＝卡爾曼濾波估計下一步位置（見軍事章節的互動示範）；配對＝位置接近＋長得像；更新＝延續舊編號。</p>
+  </div>
+
+  <h3>③ 抓很小的無人機：看「動得不一樣」（光流）</h3>
+  <p>遠方的小無人機只有幾個像素，顏色又跟背景混在一起，單看一張圖幾乎找不到。<b>光流</b>＝比對連續兩幀，算出畫面上每一點往哪移動。鏡頭在轉時背景全部同方向移動，<b>只有目標「動得跟大家不一樣」</b>，就藏不住了。</p>
+  <div class="fig" id="ofFig">
+    <div class="fig-h"><span class="tag anim">動畫</span><span class="tag int">互動</span>你找得到那台小無人機嗎？</div>
+    <div class="sv"><svg viewBox="0 0 820 240" id="of"></svg></div>
+    <div class="ctrl"><button class="pri" id="ofBtn">顯示光流</button><span class="cap" id="ofCap">先試著用眼睛找，再按「顯示光流」。</span></div>
+    <div class="sv" style="margin-top:8px"><svg viewBox="0 0 820 120">
+      <text x="10" y="12" class="ts">OF-GPRN：日夜雙視覺</text>
+      <circle cx="40" cy="30" r="10" class="fA"/><text x="60" y="35" class="tx">白天影像</text>
+      <circle cx="40" cy="62" r="10" class="fP"/><circle cx="45" cy="58" r="8.5" class="fC"/><text x="60" y="67" class="tx">夜間熱像</text>
+      <g stroke="var(--blue)" stroke-width="2" marker-end="url(#ahB)"><path d="M28 88h20"/><path d="M28 96h20"/><path d="M28 104h20"/></g><text x="60" y="100" class="tx">光流（誰在動）</text>
+      <g class="ln"><path d="M150 30C230 30 240 52 288 54" marker-end="url(#ah)"/><path d="M150 62H288" marker-end="url(#ah)" transform="translate(0,-8)"/><path d="M160 96C230 96 240 64 288 60" marker-end="url(#ah)"/></g>
+      <circle cx="310" cy="52" r="18" class="nd"/><text x="310" y="57" text-anchor="middle" class="tx">融合</text>
+      <path d="M330 52H390" class="ln" marker-end="url(#ah)"/>
+      <g class="fT"><circle cx="410" cy="36" r="5"/><circle cx="440" cy="30" r="5"/><circle cx="425" cy="60" r="5"/><circle cx="455" cy="56" r="5"/><circle cx="470" cy="38" r="5"/></g>
+      <g stroke="var(--teal)" stroke-width="1.5" fill="none"><path d="M410 36L440 30L470 38L455 56L425 60L410 36M440 30L425 60"/></g>
+      <text x="440" y="82" text-anchor="middle" class="ts">圖網路＋殘差</text>
+      <path d="M490 48H550" class="ln" marker-end="url(#ah)"/>
+      <rect x="560" y="30" width="64" height="36" rx="18" class="fGs"/><text x="592" y="53" text-anchor="middle" class="tx">是無人機</text>
+      <text x="640" y="53" class="ts">→ 白天轉夜晚時也穩定</text>
+    </svg></div>
+  </div>
+
+  <h3>② 更準的追蹤：視覺 Transformer（ViT），以及怎麼讓它跑得動</h3>
+  <p>ViT 把畫面切成小方塊，讓<b>每一塊都去參考其他所有塊</b>（注意力），所以對角度、光線變化更穩。缺點是很重。論文提到三招瘦身：</p>
+  <ul class="tight"><li><b>SGLATrack</b>：發現很多層的輸出幾乎一樣 → <b>相鄰兩層太像就直接跳過</b>，即時省算力。</li>
+  <li><b>AVTrack</b>：自適應計算＋視角不變學習＋<b>多老師蒸餾</b>（大模型教小模型）。</li>
+  <li><b>CGTrack</b>：層級特徵＋串聯閘門，只讓有用的資訊往下傳。</li></ul>
+  <div class="fig" id="vitFig">
+    <div class="fig-h"><span class="tag anim">動畫</span><span class="tag int">互動</span>左：注意力；右：SGLATrack 跳層</div>
+    <div class="sv"><svg viewBox="0 0 820 320" id="vit"></svg></div>
+    <div class="ctrl"><label>「太像就跳過」的門檻 <input type="range" id="vitTh" min="0.80" max="1" step="0.01" value="0.94"><b id="vitThv">94%</b></label><span class="cap">門檻越低 → 跳越多層 → 越快，但準度會掉。（相似度為示意數字）</span></div>
+    <div class="sv" style="margin-top:6px"><svg viewBox="0 0 820 140">
+      <text x="10" y="16" class="ts">多老師蒸餾（AVTrack）</text>
+      <g class="fB" opacity=".85"><rect x="40" y="36" width="34" height="90" rx="5"/><rect x="88" y="46" width="34" height="80" rx="5"/><rect x="136" y="30" width="34" height="96" rx="5"/></g>
+      <text x="105" y="140" text-anchor="middle" class="ts">3 個大模型老師</text>
+      <g class="ln"><path d="M176 60C260 60 290 96 360 100" marker-end="url(#ah)"/><path d="M176 90C260 90 290 102 360 104" marker-end="url(#ah)"/></g>
+      <circle r="4" class="fB"><animateMotion dur="1.8s" repeatCount="indefinite" path="M176 60C260 60 290 96 356 100"/></circle>
+      <text x="270" y="58" text-anchor="middle" class="ts">「答案長這樣」</text>
+      <rect x="370" y="86" width="34" height="40" rx="5" class="fG"/><text x="387" y="140" text-anchor="middle" class="ts">小模型學生</text>
+      <text x="430" y="96" class="tx">學生模仿老師們的輸出</text><text x="430" y="116" class="ts">→ 體積小、跑得快，準度逼近老師；上機只帶學生</text>
+    </svg></div>
+  </div>
+
+  <h3>④ 群體分工：深度強化學習（PPO）</h3>
+  <p>Arranz 等人把<b>中央任務規劃器</b>（負責分區）和<b>每台無人機上的強化學習代理</b>（負責在區內搜尋、追蹤、閃障礙）結合。強化學習＝不給標準答案，只給「得分」，讓它<b>試錯</b>學會好策略。PPO 的關鍵是「每次只准改一點點」，學習才穩定。（目前只在模擬中驗證。）</p>
+  <div class="fig" id="rlFig">
+    <div class="fig-h"><span class="tag anim">動畫</span><span class="tag int">互動</span>左：學習循環；右：PPO 的「限幅」規則</div>
+    <div class="sv"><svg viewBox="0 0 820 280" id="rl"></svg></div>
+    <div class="ctrl"><label>這次想把動作機率改成原來的 <input type="range" id="ppoR" min="0.5" max="1.5" step="0.01" value="1.35"><b id="ppoRv">1.35</b> 倍</label></div>
+    <p class="cap" id="ppoCap"></p>
+  </div>
+
+  <h3>⑤ 安全通訊：量子金鑰分發（QKD）</h3>
+  <p>QKD 用光子傳金鑰。量子特性是：<b>「偷看」就一定會改變光子</b>。所以只要雙方抽查發現錯誤率異常，就知道有人竊聽，把這把鑰匙丟掉重來。下面用最經典的 BB84 協定示範原理（論文提的是以軟體為主、用於無人機↔地面站的 QKD）。</p>
+  <div class="fig" id="qkdFig">
+    <div class="fig-h"><span class="tag anim">動畫</span><span class="tag int">互動</span>送 10 顆光子，看會不會被抓包</div>
+    <div class="sv"><svg viewBox="0 0 820 330" id="qkd"></svg></div>
+    <div class="ctrl"><button class="pri" id="qkdBtn">▶ 送光子</button><label><input type="checkbox" id="qkdEve"> 有竊聽者</label><span class="cap" id="qkdCap"></span></div>
+    <p class="cap">規則：雙方各自隨機選「＋」或「×」方式送/量。方式相同 → 讀到的一定對，留下來當金鑰；方式不同 → 丟掉。竊聽者也得猜方式，猜錯就會把光子「弄歪」，留下錯誤。缺點：需要直視線、產生金鑰慢、怕天候。</p>
+  </div>
+
+  <h3>從論文到產品：商用機 vs 學術原型</h3>
+  <div class="fig">
+    <div class="fig-h">續航時間比一比（小時）</div>
+    <div class="sv"><svg viewBox="0 0 820 220" id="endur"></svg></div>
+  </div>
+  <div class="grid g3 small">
+    <div class="card"><b>DJI Mavic 3 Enterprise</b><br><span class="chip">約 45 分鐘</span><span class="chip">56× 變焦</span><span class="chip">RTK 精準定位</span><span class="chip">熱像版</span><br>定位：測繪、巡檢、搜救</div>
+    <div class="card"><b>Parrot ANAFI Ai</b><br><span class="chip">約 32 分鐘</span><span class="chip">4G/LTE</span><span class="chip">4800 萬畫素</span><span class="chip">自主測繪</span><br>定位：大範圍測繪、野外作業</div>
+    <div class="card"><b>Skydio X2</b><br><span class="chip">360° 避障</span><span class="chip">AI 自主飛行</span><span class="chip">熱像</span><br>定位：公共安全、雜亂環境中安全飛行</div>
+  </div>
+  <div class="tw" style="margin-top:12px"><table class="t">
+    <tr><th>面向</th><th>商用機</th><th>學術原型（Jetson、樹莓派＋自訂感測器）</th></tr>
+    <tr><td>續航</td><td>30–45 分，可熱插拔電池、充電站</td><td>太陽能 2–5 小時、燃料電池 7 小時；但多數 ≤ 商用機，且不穩定</td></tr>
+    <tr><td>載重</td><td>200 g – 2 kg（相機、LiDAR、熱像）</td><td>可裝更大的實驗酬載，但越重飛越短</td></tr>
+    <tr><td>機上 AI</td><td>內建辨識、追蹤、避障（NVIDIA Jetson、Qualcomm）</td><td>受實驗硬體限制</td></tr>
+    <tr><td>自主性</td><td>避障、任務規劃軟體現成可用</td><td>研究更先進的（多機協同、自癒網路），但離實戰遠</td></tr>
+    <tr><td>法規認證</td><td>符合 BVLOS、地理圍欄、遠端識別</td><td class="con" style="font-weight:500">常忽略法規，很少送認證</td></tr>
+    <tr><td>資料安全</td><td>有加密，但有被廠商綁住、跨境外洩疑慮</td><td class="con" style="font-weight:500">通常不重視，資料庫常沒保護</td></tr>
+    <tr><td>環境耐受</td><td>有防水等級，能抗一般風雨</td><td>多在受控環境測試，很少實地驗證</td></tr>
+  </table></div>
+  <div class="key">一句話：<b>商用機＝穩、合法、能直接用；學術原型＝新、彈性大，但耐用度、續航、規模化都還不夠。</b>這就是論文說的「研究到實務的鴻溝」。</div>
+</section>
+
+<script>
+/* anomaly */
+(function(){
+  const svg=document.getElementById('anom');const cap=document.getElementById('anomCap');
+  S('rect',{x:20,y:95,width:96,height:72,rx:6,class:'nd'},svg);S('path',{d:'M24 150H112',stroke:'var(--line)','stroke-width':6},svg);U(svg,'i-car',50,146,26,14,'cB');U(svg,'i-car',86,146,26,14,'cM');
+  T(svg,68,186,'空拍影像','ts',{'text-anchor':'middle'});
+  S('path',{d:'M120 131H150',class:'ln','marker-end':'url(#ah)'},svg);
+  const L=[[160,[105,125,145,165]],[195,[115,135,155]],[230,[125,145]]];
+  L.forEach((l,i)=>{if(i<2)l[1].forEach(a=>L[i+1][1].forEach(b=>S('line',{x1:l[0],y1:a,x2:L[i+1][0],y2:b,stroke:'var(--line)'},svg)));});
+  L.forEach(l=>l[1].forEach(y=>S('circle',{cx:l[0],cy:y,r:6,class:'fP'},svg)));
+  T(svg,195,186,'神經網路','ts',{'text-anchor':'middle'});
+  S('path',{d:'M240 135H272',class:'ln','marker-end':'url(#ah)'},svg);
+  const fdot=S('circle',{cx:290,cy:135,r:7,class:'fB'},svg);T(svg,290,186,'一個特徵點','ts',{'text-anchor':'middle'});
+  S('path',{d:'M302 135H336',class:'ln','marker-end':'url(#ah)'},svg);
+  S('rect',{x:345,y:16,width:460,height:258,rx:10,class:'nd'},svg);T(svg,358,36,'特徵空間（示意：每個點＝一張畫面）','ts');
+  const r=rng(3);const g=()=>{let u=0;for(let i=0;i<6;i++)u+=r();return (u-3)/1.2;};
+  const normals=[];for(let i=0;i<46;i++)normals.push([575+g()*58,150+g()*36]);
+  const nEls=normals.map(p=>S('circle',{cx:p[0],cy:p[1],r:4.5,class:'fB fade',opacity:0},svg));
+  const bound=S('ellipse',{cx:575,cy:150,rx:150,ry:92,fill:'var(--green)','fill-opacity':.07,stroke:'var(--green)','stroke-width':2,'stroke-dasharray':'6 5',class:'fade',opacity:0},svg);
+  const bLab=T(svg,575,252,'學出來的「正常範圍」','ts',{'text-anchor':'middle',fill:'var(--green)',class:'ts fade',opacity:0});
+  const tests=[[610,175,1],[730,52,0],[520,120,1],[400,240,0],[640,110,1],[750,236,0]];
+  const tEls=[];
+  const go=player(document.getElementById('anomBtn'),async W=>{
+    nEls.forEach(e=>e.setAttribute('opacity',0));bound.setAttribute('opacity',0);bLab.setAttribute('opacity',0);tEls.forEach(e=>e.remove());tEls.length=0;
+    cap.innerHTML='① 訓練：只餵<b>正常</b>空拍，每張變成一個藍點';
+    for(let i=0;i<nEls.length;i++){nEls[i].setAttribute('opacity',.75);fdot.setAttribute('r',i%2?7:9);await W(45);}
+    await W(400);cap.innerHTML='② 圈出藍點聚集的地方 = <b>正常範圍</b>';bound.setAttribute('opacity',1);bLab.setAttribute('opacity',1);await W(1300);
+    cap.innerHTML='③ 上線：新畫面進來，看它落在圈內還是圈外';
+    for(const [x,y,ok] of tests){const c=S('circle',{cx:290,cy:135,r:7,fill:'var(--fg)'},svg);tEls.push(c);
+      await tween(700,t=>{c.setAttribute('cx',290+(x-290)*t);c.setAttribute('cy',135+(y-135)*t);});
+      c.setAttribute('fill',ok?'var(--green)':'var(--red)');c.setAttribute('r',ok?6:8);
+      const lb=T(svg,x>680?x-12:x+12,y+5,ok?'✓ 正常':'⚠ 異常！',ok?'ts':'tb',{fill:ok?'var(--green)':'var(--red)','text-anchor':x>680?'end':'start'});tEls.push(lb);
+      cap.innerHTML=ok?'落在圈內 → <b>正常</b>，不打擾人':'落在圈外 → <b style="color:var(--red)">異常</b>，通知操作員';await W(1000);}
+    cap.innerHTML='重點：從頭到尾<b>不需要任何「異常」的標註資料</b>。缺點：正常樣本要夠一致，極罕見的異常仍可能漏掉。';
+  });
+  onVisible(document.getElementById('anomFig'),go,.4);
+})();
+/* siamese */
+(function(){
+  const svg=document.getElementById('siam');const cap=document.getElementById('siamCap');
+  S('rect',{x:20,y:30,width:80,height:70,rx:6,class:'nd'},svg);U(svg,'i-car',60,66,52,28,'cR');T(svg,60,118,'樣板（目標）','ts',{'text-anchor':'middle'});
+  S('rect',{x:20,y:160,width:80,height:70,rx:6,class:'nd'},svg);for(let i=0;i<4;i++)for(let j=0;j<3;j++)S('rect',{x:24+i*18,y:166+j*20,width:16,height:18,fill:'var(--soft)'},svg);T(svg,60,248,'搜尋區（新的一幀）','ts',{'text-anchor':'middle'});
+  const trap=y=>`M130 ${y-28}L190 ${y-14}V${y+14}L130 ${y+28}Z`;
+  S('path',{d:trap(65),class:'fP',opacity:.85},svg);S('path',{d:trap(195),class:'fP',opacity:.85},svg);
+  S('path',{d:'M104 65H128',class:'ln','marker-end':'url(#ah)'},svg);S('path',{d:'M104 195H128',class:'ln','marker-end':'url(#ah)'},svg);
+  S('path',{d:'M160 98V162',stroke:'var(--purple)','stroke-width':2,'stroke-dasharray':'3 3'},svg);T(svg,168,134,'同一套參數','ts',{fill:'var(--purple)'});
+  S('path',{d:'M194 65C240 65 240 120 262 126',class:'ln','marker-end':'url(#ah)'},svg);S('path',{d:'M194 195C240 195 240 140 262 134',class:'ln','marker-end':'url(#ah)'},svg);
+  S('circle',{cx:284,cy:130,r:20,class:'nd'},svg);T(svg,284,135,'比對','tx',{'text-anchor':'middle'});
+  S('path',{d:'M306 130H350',class:'ln','marker-end':'url(#ah)'},svg);
+  const GX=360,GY=26,C=50,cols=8,rows=5;
+  S('rect',{x:GX,y:GY,width:C*cols,height:C*rows,rx:6,class:'nd'},svg);
+  const heat=[];for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){heat.push(S('rect',{x:GX+i*C+1,y:GY+j*C+1,width:C-2,height:C-2,rx:4,fill:'var(--orange)','fill-opacity':0},svg));}
+  U(svg,'i-car',GX+5.5*C,GY+3.5*C,40,22,'cR');U(svg,'i-car',GX+2.5*C,GY+1.5*C,34,19,'cO');U(svg,'i-car',GX+1.5*C,GY+3.5*C,40,22,'cB');U(svg,'i-tree',GX+6.5*C,GY+1.5*C,28,38,'cG');U(svg,'i-person',GX+3.5*C,GY+3.5*C,14,26,'cM');
+  const r=rng(11);const sim=[];for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){let s=0.04+r()*0.1;const dT=Math.max(Math.abs(i-5),Math.abs(j-3)),dD=Math.max(Math.abs(i-2),Math.abs(j-1));if(dT===0)s=1;else if(dT===1)s=Math.max(s,0.38);if(dD===0)s=Math.max(s,0.55);else if(dD===1)s=Math.max(s,0.2);if(i===1&&j===3)s=0.22;sim.push(s);}
+  const win=S('rect',{x:GX,y:GY,width:C,height:C,rx:4,fill:'none',stroke:'var(--fg)','stroke-width':2.5,opacity:0},svg);
+  const found=S('rect',{x:GX+5*C-3,y:GY+3*C-3,width:C+6,height:C+6,rx:6,fill:'none',stroke:'var(--red)','stroke-width':3.5,opacity:0},svg);
+  const fl=T(svg,GX+5*C+C/2,GY+rows*C+20,'','tb',{'text-anchor':'middle',fill:'var(--red)'});
+  const go=player(document.getElementById('siamBtn'),async W=>{
+    heat.forEach(h=>h.setAttribute('fill-opacity',0));found.setAttribute('opacity',0);fl.textContent='';win.setAttribute('opacity',1);
+    cap.innerHTML='樣板在每個位置比一比，<b>越像顏色越深</b>';
+    for(let k=0;k<heat.length;k++){const i=k%cols,j=Math.floor(k/cols);win.setAttribute('x',GX+i*C);win.setAttribute('y',GY+j*C);heat[k].setAttribute('fill-opacity',sim[k]*0.85);await W(70);}
+    win.setAttribute('opacity',0);found.setAttribute('opacity',1);fl.textContent='最熱 → 目標在這！';
+    cap.innerHTML='注意左上那台<b>橘色車</b>也有點像（干擾物），但最高分仍是真正目標。速度與準度的平衡正是此法重點。';
+  });
+  onVisible(document.getElementById('siamFig'),go,.4);
+})();
+/* multi-object tracking */
+(function(){
+  const svg=document.getElementById('mot');
+  const cx=130,cy=145,R=82;S('circle',{cx,cy,r:R,class:'ln'},svg);
+  const st=[['偵測','YOLO 框出',-90,'fB'],['預測','下一步在哪',0,'fP'],['配對','位置＋外觀',90,'fO'],['更新','延續編號',180,'fG']];
+  st.forEach(([a,b,ang,c])=>{const x=cx+R*Math.cos(ang*Math.PI/180),y=cy+R*Math.sin(ang*Math.PI/180);S('circle',{cx:x,cy:y,r:27,class:c},svg);T(svg,x,y+5,a,'tx',{'text-anchor':'middle',fill:'#fff','font-weight':700});T(svg,x,y+(ang===-90?-34:42),b,'ts',{'text-anchor':'middle'});});
+  const dd=S('circle',{r:6,fill:'var(--fg)'},svg);S('animateMotion',{dur:'3.2s',repeatCount:'indefinite',path:`M${cx} ${cy-R}A${R} ${R} 0 1 1 ${cx-0.1} ${cy-R}`},dd);
+  const X0=290,X1=805;S('rect',{x:X0,y:16,width:X1-X0,height:258,rx:10,fill:'var(--soft)'},svg);
+  const objs=[{id:1,c:'var(--blue)',ic:'i-person',w:16,h:30,y:70,x0:310,v:52},{id:2,c:'var(--orange)',ic:'i-car',w:44,h:24,y:160,x0:300,v:62},{id:3,c:'var(--purple)',ic:'i-person',w:16,h:30,y:238,x0:790,v:-48}];
+  const L=S('g',{},svg);
+  objs.forEach(o=>{o.el=U(L,o.ic,0,0,o.w,o.h,'');o.el.style.color=o.c;});
+  const tree=U(svg,'i-tree',560,150,92,120,'cG');
+  const B=S('g',{},svg);
+  objs.forEach(o=>{o.box=S('rect',{fill:'none',stroke:o.c,'stroke-width':2.2,rx:3},B);o.lab=T(B,0,0,'','ts',{fill:o.c,'font-weight':700});});
+  let t0=performance.now();
+  function frame(now){let t=((now-t0)/1000)%8.5;
+    objs.forEach(o=>{let x=o.x0+o.v*t;if(x>X1-20||x<X0+10){o.el.setAttribute('opacity',0);o.box.setAttribute('opacity',0);o.lab.textContent='';return;}
+      o.el.setAttribute('opacity',1);o.box.setAttribute('opacity',1);o.el.setAttribute('x',x-o.w/2);o.el.setAttribute('y',o.y-o.h/2);
+      const hidden=o.id===2&&x>520&&x<600;const after=o.id===2&&x>=600&&x<650;
+      o.box.setAttribute('x',x-o.w/2-5);o.box.setAttribute('y',o.y-o.h/2-5);o.box.setAttribute('width',o.w+10);o.box.setAttribute('height',o.h+10);
+      o.box.setAttribute('stroke-dasharray',hidden?'5 4':'none');
+      o.lab.setAttribute('x',x-o.w/2-5);o.lab.setAttribute('y',o.y-o.h/2-10);
+      o.lab.textContent='ID '+o.id+(hidden?'  被擋住，靠預測…':after?'  ✓ 認回來了':'');});
+    requestAnimationFrame(frame);}
+  onVisible(document.getElementById('motFig'),()=>{t0=performance.now();requestAnimationFrame(frame);});
+})();
+/* optical flow */
+(function(){
+  const svg=document.getElementById('of');const W=820,H=240;
+  S('rect',{x:0,y:0,width:W,height:H,rx:10,fill:'var(--soft)'},svg);
+  const clouds=[];for(let i=0;i<6;i++){clouds.push({x:i*150+20,y:20+(i%3)*60,el:U(svg,'i-cloud',0,0,110,66,'cM')});clouds[i].el.setAttribute('opacity',.22);}
+  const flow=S('g',{opacity:0,class:'fade'},svg);
+  for(let x=60;x<W;x+=60)for(let y=30;y<H;y+=50)S('path',{d:`M${x+8} ${y}H${x-10}`,stroke:'var(--muted)','stroke-width':1.6,'marker-end':'url(#ah)',opacity:.7},flow);
+  const drone=U(svg,'i-quad',0,0,16,9,'cM');drone.setAttribute('opacity',.55);
+  const hl=S('g',{opacity:0,class:'fade'},svg);const ring=S('circle',{r:20,fill:'none',stroke:'var(--red)','stroke-width':2.5},hl);const arr=S('path',{stroke:'var(--red)','stroke-width':2.6,'marker-end':'url(#ahR)'},hl);const lab=T(hl,0,0,'動得不一樣 → 可疑目標','tb',{fill:'var(--red)'});
+  let on=false;const btn=document.getElementById('ofBtn');const cap=document.getElementById('ofCap');
+  btn.onclick=()=>{on=!on;flow.setAttribute('opacity',on?1:0);hl.setAttribute('opacity',on?1:0);btn.textContent=on?'隱藏光流':'顯示光流';cap.innerHTML=on?'灰色箭頭＝背景（鏡頭在轉，全部往左）；<b style="color:var(--red)">紅色</b>＝唯一往右上飛的東西。':'先試著用眼睛找，再按「顯示光流」。';};
+  let t0=performance.now();
+  function f(now){const t=(now-t0)/1000;clouds.forEach(c=>{let x=((c.x-t*28)%(W+160)+W+160)%(W+160)-120;c.el.setAttribute('x',x);c.el.setAttribute('y',c.y);});
+    const p=(t*0.06)%1;const dx=180+p*460,dy=190-p*140;drone.setAttribute('x',dx-8);drone.setAttribute('y',dy-4.5);
+    ring.setAttribute('cx',dx);ring.setAttribute('cy',dy);arr.setAttribute('d',`M${dx+8} ${dy-6}L${dx+30} ${dy-22}`);lab.setAttribute('x',dx+34);lab.setAttribute('y',dy-24);if(dx>560)lab.setAttribute('x',dx-200);
+    requestAnimationFrame(f);}
+  onVisible(document.getElementById('ofFig'),()=>requestAnimationFrame(f));
+})();
+/* ViT + layer skipping */
+(function(){
+  const svg=document.getElementById('vit');
+  const P=56,ox=30,oy=40;
+  for(let j=0;j<4;j++)for(let i=0;i<4;i++)S('rect',{x:ox+i*P,y:oy+j*P,width:P-2,height:P-2,rx:3,fill:j<2?'var(--blue-s)':'var(--green-s)'},svg);
+  U(svg,'i-car',ox+2*P+P/2-1,oy+2*P+P/2,40,22,'cR');U(svg,'i-tree',ox+0.5*P,oy+2.5*P,30,40,'cG');U(svg,'i-cloud',ox+3*P+P/2,oy+0.5*P,44,28,'cM');
+  T(svg,ox,26,'切成 16 塊，每塊都去參考其他塊','ts');
+  const att=S('g',{},svg);const hi=S('rect',{width:P-2,height:P-2,rx:3,fill:'none',stroke:'var(--fg)','stroke-width':3},svg);
+  T(svg,ox+2*P,oy+4*P+22,'線越粗＝越重要（車子那幾塊最受關注）','ts',{'text-anchor':'middle'});
+  const r=rng(5);let k=0;
+  function showAtt(){att.innerHTML='';const i=[0,5,10,15,9,3][k%6];k++;const ci=i%4,cj=Math.floor(i/4);hi.setAttribute('x',ox+ci*P);hi.setAttribute('y',oy+cj*P);
+    for(let q=0;q<16;q++){if(q===i)continue;const qi=q%4,qj=Math.floor(q/4);let w=0.4+r()*1.4;if(q===10||q===9||q===11)w+=3;S('line',{x1:ox+ci*P+P/2,y1:oy+cj*P+P/2,x2:ox+qi*P+P/2,y2:oy+qj*P+P/2,stroke:'var(--orange)','stroke-width':w,opacity:.75},att);}}
+  /* layers */
+  const sims=[null,.62,.74,.96,.97,.81,.95,.98,.86,.97,.99,.88];
+  const LX=345,LW=170,LH=16,G=4,baseY=290;
+  T(svg,LX+LW/2,22,'12 層 Transformer（由下往上算）','ts',{'text-anchor':'middle'});
+  const lay=sims.map((s,i)=>{const y=baseY-(i+1)*(LH+G);const g=S('g',{},svg);const rc=S('rect',{x:LX,y,width:LW,height:LH,rx:4},g);T(g,LX-8,y+12,'第'+(i+1)+'層','ts',{'text-anchor':'end'});const st=T(g,LX+LW+8,y+12,s?('與上層像 '+Math.round(s*100)+'%'):'','ts');return {y,rc,st,s};});
+  const tok=S('circle',{r:7,fill:'var(--blue)'},svg);
+  const mX=665;T(svg,mX,60,'速度','tx');const spB=S('rect',{x:mX,y:68,height:14,rx:7,fill:'var(--green)'},svg);const spT=T(svg,mX,100,'','ts');
+  T(svg,mX,140,'準確度','tx');const acB=S('rect',{x:mX,y:148,height:14,rx:7,fill:'var(--blue)'},svg);const acT=T(svg,mX,180,'','ts');
+  S('rect',{x:mX,y:68,width:100,height:14,rx:7,fill:'none',stroke:'var(--line)'},svg);S('rect',{x:mX,y:148,width:100,height:14,rx:7,fill:'none',stroke:'var(--line)'},svg);
+  const th=document.getElementById('vitTh'),thv=document.getElementById('vitThv');let active=[];
+  function upd(){const v=+th.value;thv.textContent=Math.round(v*100)+'%';active=[];let skipped=0,loss=0;
+    lay.forEach((l,i)=>{const sk=l.s&&l.s>v;l.rc.setAttribute('fill',sk?'var(--soft)':'var(--purple)');l.rc.setAttribute('opacity',sk?1:.8);l.rc.setAttribute('stroke',sk?'var(--line)':'none');l.rc.setAttribute('stroke-dasharray',sk?'4 3':'none');l.st.setAttribute('fill',sk?'var(--muted)':'var(--fg)');l.st.textContent=l.s?('與上層像 '+Math.round(l.s*100)+'%'+(sk?' → 跳過':'')):'';if(sk){skipped++;loss+=(1-l.s)*9;}else active.push(i);});
+    const sp=12/(12-skipped);spB.setAttribute('width',Math.min(100,sp/2.2*100));spT.textContent='約 '+sp.toFixed(1)+' 倍（跳過 '+skipped+' 層）';
+    const ac=100-loss;acB.setAttribute('width',ac);acT.textContent='約 '+ac.toFixed(1)+'%（示意）';}
+  th.addEventListener('input',upd);upd();
+  let t0=performance.now();
+  function f(now){const per=280;const n=active.length;const t=((now-t0)/per)%(n+2);const idx=Math.min(n-1,Math.floor(t));const fr=t-Math.floor(t);
+    const a=active[Math.max(0,idx)],b=active[Math.min(n-1,idx+1)];const ya=lay[a].y+LH/2,yb=lay[b].y+LH/2;const y=t>=n?lay[active[n-1]].y-14:ya+(yb-ya)*Math.min(1,fr*1.6);
+    tok.setAttribute('cx',LX+LW/2);tok.setAttribute('cy',y);requestAnimationFrame(f);}
+  onVisible(document.getElementById('vitFig'),()=>{showAtt();setInterval(showAtt,1500);requestAnimationFrame(f);});
+})();
+/* RL loop + PPO */
+(function(){
+  const svg=document.getElementById('rl');
+  U(svg,'i-quad',140,52,70,40,'cB');T(svg,140,92,'無人機（代理人）','ts',{'text-anchor':'middle'});
+  S('rect',{x:70,y:176,width:140,height:78,rx:8,fill:'var(--soft)'},svg);U(svg,'i-person',110,214,12,22,'cR');U(svg,'i-tree',170,212,22,30,'cG');T(svg,140,272,'環境（地圖、目標、障礙）','ts',{'text-anchor':'middle'});
+  S('path',{id:'rlA',d:'M190 52C300 52 300 200 214 210',class:'ln','marker-end':'url(#ah)'},svg);S('path',{id:'rlB',d:'M66 214C-20 200 -10 60 96 52',class:'ln','marker-end':'url(#ah)'},svg);
+  T(svg,286,130,'動作','tx');T(svg,286,148,'往哪飛','ts');T(svg,50,130,'觀察＋得分','tx');T(svg,50,148,'看到什麼','ts');
+  const tk=S('circle',{r:6,class:'fO'},svg);const am=S('animateMotion',{dur:'3s',repeatCount:'indefinite',path:'M190 52C300 52 300 200 214 210L210 214L66 214C-20 200 -10 60 96 52Z'},tk);
+  const rw=T(svg,140,172,'','tb',{'text-anchor':'middle'});
+  let n=0;setInterval(()=>{n++;const good=n%3!==0;rw.textContent=good?'+1 找到目標':'−1 太靠近障礙';rw.setAttribute('fill',good?'var(--green)':'var(--red)');},1500);
+  S('line',{x1:360,y1:10,x2:360,y2:270,stroke:'var(--line)'},svg);
+  /* PPO plot */
+  const px=r=>440+(r-0.5)*360,py=v=>140-v*80;
+  S('rect',{x:px(0.8),y:20,width:px(1.2)-px(0.8),height:240,fill:'var(--green-s)'},svg);T(svg,px(1),36,'安全區 ±20%','ts',{'text-anchor':'middle',fill:'var(--green)'});
+  S('line',{x1:px(0.5),x2:px(1.5),y1:py(0),y2:py(0),stroke:'var(--line)'},svg);S('line',{x1:px(1),x2:px(1),y1:20,y2:260,stroke:'var(--line)','stroke-dasharray':'3 3'},svg);
+  T(svg,px(1.5),py(0)+16,'改動幅度 →','ts',{'text-anchor':'end'});T(svg,px(0.5)+2,30,'得到的「分數」','ts');
+  T(svg,px(0.5),272,'0.5 倍','ts');T(svg,px(1),272,'1（不改）','ts',{'text-anchor':'middle'});T(svg,px(1.5),272,'1.5 倍','ts',{'text-anchor':'end'});
+  S('path',{d:`M${px(.5)} ${py(.5)}L${px(1.5)} ${py(1.5)}`,class:'lnd'},svg);S('path',{d:`M${px(.5)} ${py(-.5)}L${px(1.5)} ${py(-1.5)}`,class:'lnd'},svg);
+  S('path',{d:`M${px(.5)} ${py(.5)}L${px(1.2)} ${py(1.2)}H${px(1.5)}`,stroke:'var(--green)','stroke-width':3,fill:'none'},svg);
+  S('path',{d:`M${px(.5)} ${py(-.8)}H${px(.8)}L${px(1.5)} ${py(-1.5)}`,stroke:'var(--red)','stroke-width':3,fill:'none'},svg);
+  T(svg,px(1.5)-4,py(1.2)-8,'好動作','ts',{'text-anchor':'end',fill:'var(--green)'});T(svg,px(.5)+4,py(-.8)+18,'壞動作','ts',{fill:'var(--red)'});
+  const vl=S('line',{y1:20,y2:260,stroke:'var(--fg)','stroke-width':1.5},svg);const dg=S('circle',{r:6,fill:'var(--green)'},svg);const drd=S('circle',{r:6,fill:'var(--red)'},svg);
+  const rIn=document.getElementById('ppoR'),rv=document.getElementById('ppoRv'),cap=document.getElementById('ppoCap');
+  function upd(){const r=+rIn.value;rv.textContent=r.toFixed(2);const c=Math.min(Math.max(r,0.8),1.2);const g=Math.min(r,c),b=-Math.max(r,c);
+    vl.setAttribute('x1',px(r));vl.setAttribute('x2',px(r));dg.setAttribute('cx',px(r));dg.setAttribute('cy',py(g));drd.setAttribute('cx',px(r));drd.setAttribute('cy',py(b));
+    cap.innerHTML=r>1.2?`好動作想加碼到 ${r.toFixed(2)} 倍，但分數最多只算到 1.2 倍（綠線變平）→ <b>沒動力改太猛</b>。`:r<0.8?`壞動作想砍到 ${r.toFixed(2)} 倍，但最多只算砍到 0.8 倍（紅線變平）→ <b>一樣不准改太猛</b>。`:`在 ±20% 安全區內，照常給分。`;}
+  rIn.addEventListener('input',upd);upd();
+})();
+/* QKD BB84 */
+(function(){
+  const svg=document.getElementById('qkd');
+  U(svg,'i-quad',70,50,70,40,'cB');T(svg,70,90,'無人機','ts',{'text-anchor':'middle'});
+  U(svg,'i-tower',750,44,40,48,'cT');T(svg,750,90,'地面站','ts',{'text-anchor':'middle'});
+  S('line',{x1:110,y1:50,x2:720,y2:50,stroke:'var(--line)','stroke-width':2},svg);
+  const eve=S('g',{opacity:0,class:'fade'},svg);S('ellipse',{cx:410,cy:50,rx:22,ry:13,fill:'var(--card)',stroke:'var(--red)','stroke-width':2.5},eve);S('circle',{cx:410,cy:50,r:6,fill:'var(--red)'},eve);T(eve,410,84,'竊聽者','ts',{'text-anchor':'middle',fill:'var(--red)'});
+  const ph=S('g',{opacity:0},svg);S('circle',{r:13,fill:'var(--amber)'},ph);const phT=T(ph,0,5,'','tb',{'text-anchor':'middle',fill:'#1c1d20'});
+  const rows=['送出的位元','送出方式','地面站量法','地面站讀到','方式相同？'];const RY=y=>130+y*36;
+  rows.forEach((r,i)=>T(svg,20,RY(i)+5,r,'tx'));
+  const CX=i=>190+i*60;const cells=[];for(let i=0;i<10;i++){cells.push(rows.map((_,j)=>T(svg,CX(i),RY(j)+5,'','tb',{'text-anchor':'middle'})));}
+  const sym=(b,bit)=>b==='+'?(bit?'│':'—'):(bit?'╲':'╱');
+  const cap=document.getElementById('qkdCap');const eveCb=document.getElementById('qkdEve');
+  eveCb.onchange=()=>eve.setAttribute('opacity',eveCb.checked?1:0);
+  const go=player(document.getElementById('qkdBtn'),async W=>{
+    cells.forEach(c=>c.forEach(t=>{t.textContent='';t.removeAttribute('fill');}));cap.textContent='';
+    const evil=eveCb.checked;const r=Math.random;let kept=0,err=0;
+    for(let i=0;i<10;i++){
+      const bit=r()<.5?0:1,ab=r()<.5?'+':'×',bb=r()<.5?'+':'×';
+      cells[i][0].textContent=bit;cells[i][1].textContent=ab;
+      let pb=ab,pbit=bit;phT.textContent=sym(pb,pbit);ph.setAttribute('opacity',1);
+      await tween(evil?380:700,t=>ph.setAttribute('transform',`translate(${110+(evil?300:610)*t},50)`),t=>t);
+      if(evil){const eb=r()<.5?'+':'×';if(eb!==pb){pb=eb;pbit=r()<.5?0:1;}phT.textContent=sym(pb,pbit);await tween(380,t=>ph.setAttribute('transform',`translate(${410+310*t},50)`),t=>t);}
+      ph.setAttribute('opacity',0);
+      const got=bb===pb?pbit:(r()<.5?0:1);cells[i][2].textContent=bb;cells[i][3].textContent=got;
+      const same=ab===bb;cells[i][4].textContent=same?'✓ 留':'✗ 丟';cells[i][4].setAttribute('fill',same?'var(--green)':'var(--muted)');
+      if(same){kept++;if(got!==bit){err++;cells[i][3].setAttribute('fill','var(--red)');}}
+      await W(220);
+    }
+    const rate=kept?Math.round(err/kept*100):0;
+    cap.innerHTML=err?`留下 ${kept} 位，抽查錯了 <b style="color:var(--red)">${err} 位（${rate}%）</b> → 有人偷聽！這把金鑰作廢。`:`留下 ${kept} 位，抽查<b style="color:var(--green)">全部吻合</b> → ${evil?'這次竊聽者運氣好沒被抓到，多送幾顆光子就藏不住（每顆約 25% 機率留下錯誤）':'安全，可以當金鑰'}。`;
+  });
+})();
+/* endurance chart */
+(function(){
+  const svg=document.getElementById('endur');const x=h=>200+h*76;
+  for(let h=0;h<=8;h++){S('line',{x1:x(h),x2:x(h),y1:10,y2:190,stroke:'var(--line)','stroke-width':h?0.6:1.2},svg);T(svg,x(h),208,h+'h','ts',{'text-anchor':'middle'});}
+  const R=[['DJI Mavic 3E',0,0.75,'fB','約 45 分'],['Parrot ANAFI Ai',0,0.53,'fB','約 32 分'],['商用機一般',0.5,0.75,'fB','30–45 分'],['多數實驗原型',0.1,0.75,'fM','≤ 商用機'],['太陽能原型',2,5,'fO','2–5 小時'],['燃料電池原型',0,7,'fO','約 7 小時']];
+  R.forEach(([n,a,b,c,l],i)=>{const y=22+i*28;T(svg,190,y+13,n,'tx',{'text-anchor':'end'});const rc=S('rect',{x:x(a),y,width:0,height:18,rx:4,class:c,opacity:a?0.75:1},svg);T(svg,x(b)+6,y+13,l,'ts');onVisible(svg,()=>tween(1200,t=>rc.setAttribute('width',(x(b)-x(a))*t)));});
+})();
+</script>
+
+
+<!-- ===================== APPLICATIONS ===================== -->
+<section id="apps">
+  <div class="kicker">RQ3 · 應用</div>
+  <h2>無人機監控用在哪？四大戰場</h2>
+  <p>論文把文獻分成 4 個領域（另外圖 5 也列出交通、野生動物、救災）。每個領域我挑出<b>用到的方法</b>畫成動畫；點上方分頁切換。</p>
+  <div class="tabs" id="appTabs">
+    <button class="on" data-p="pBorder">🛂 邊境</button><button data-p="pAgri">🌾 農業</button><button data-p="pMil">🎖 軍事戰術</button><button data-p="pUrban">🏙 城市</button>
+  </div>
+
+  <!-- ===== BORDER ===== -->
+  <div class="pane show" id="pBorder">
+    <h3>地面感測網＋四軸無人機 <span class="ref">[31]</span></h3>
+    <p>邊境太長，無人機不可能一直飛。做法是沿線埋<b>無線感測器（WSN）</b>，有人越界才派無人機過去看。感測器位置用 <b>RFID</b> 校正，派哪台用<b>啟發式排程</b>（快速找「夠好」的答案，不求數學最佳）。</p>
+    <div class="fig" id="wsnFig">
+      <div class="fig-h"><span class="tag anim">動畫</span>越界 → 感測 → 接力回報 → 派機 → 錄影</div>
+      <div class="sv"><svg viewBox="0 0 820 260" id="wsn"></svg></div>
+      <p class="cap" id="wsnCap"></p>
+    </div>
+
+    <h3>邊境充電線：要多長？要幾台？ <span class="ref">[32]</span></h3>
+    <p>小無人機電池撐不久，所以沿邊境鋪<b>無線充電線（e-line）</b>，無人機飛過去就能邊飛邊充。問題是：充電線鋪越長越貴，但需要的無人機越少——兩個目標互相拉扯。作者用<b>多目標混合整數非線性規劃（MINLP）</b>，給出一整排「<b>Pareto 最佳解</b>」讓決策者挑，並以美墨邊境為案例。</p>
+    <div class="fig" id="paretoFig">
+      <div class="fig-h"><span class="tag int">互動</span>點選橘色點，看邊境配置怎麼變（示意數據）</div>
+      <div class="sv"><svg viewBox="0 0 820 320" id="pareto"></svg></div>
+      <p class="cap" id="paretoCap">Pareto 最佳＝<b>想改善一邊，另一邊一定變差</b>。灰點則是「被打敗」的方案：一定有橘點兩項都比它好。</p>
+    </div>
+
+    <h3>挑哪一款無人機系統？多準則決策 MPSI-SPOTIS <span class="ref">[33]</span></h3>
+    <p>軍方採購要同時考慮航程、價格、續航……作者把兩個方法串起來：<b>MPSI</b> 負責「每個指標該多重要」，<b>SPOTIS</b> 負責「每個方案離完美有多遠」。最大優點：<b>之後加入新方案，舊方案的排名不會亂掉</b>。</p>
+    <div class="fig" id="mcdaFig">
+      <div class="fig-h"><span class="tag flow">流程</span><span class="tag int">互動</span>5 步算出排名</div>
+      <div class="sv"><svg viewBox="0 0 820 120" id="mcdaFlow"></svg></div>
+      <div class="tw"><table class="t" id="mcdaTbl"></table></div>
+      <div class="sv"><svg viewBox="0 0 820 250" id="mcda"></svg></div>
+      <div class="ctrl"><button class="pri" id="mcdaAdd">＋ 加入新方案 E</button><button id="mcdaReset">重來</button><span class="cap" id="mcdaCap"></span></div>
+    </div>
+    <details class="small"><summary>算法細節（想深入再看）</summary>
+      <p><b>MPSI 權重</b>：① 把每個指標換成 0–1（越大越好用「值÷最大值」，越小越好用「最小值÷值」）→ ② 算每個指標裡各方案和平均差多少（偏差平方和）→ ③ 偏差越大＝越能分出高下 → 權重越大。<br>
+      <b>SPOTIS 分數</b>：專家先定好每個指標的上下限，理想點＝最好的那一端；每個方案的分數＝Σ 權重 ×｜方案值 − 理想值｜÷（上限 − 下限）。分數越小越好。因為上下限和理想點是事先固定的、不靠現有方案算，所以加新方案不會改動舊方案的分數。<br>
+      <span class="muted">本示範：權重用 A–D 先算好後固定。</span></p>
+    </details>
+
+    <h3>其他兩篇</h3>
+    <div class="grid g2">
+      <div class="card small"><b>單板電腦＋YOLOv8n <span class="ref">[34]</span></b><br>用小電腦直接在機上跑最輕量的 YOLOv8n，取代昂貴的長距離固定攝影機；分三個監控層級，平行處理加快偵測。<br><span class="con">缺點：</span>紅外線解析度低、模糊與遮擋影響大。</div>
+      <div class="card small"><b>雲台攝影機＋無人機混合系統 <span class="ref">[35]</span></b><br>三個目標：抓到入侵者、觀察行為、壓低成本。用強化學習調參數：
+        <svg viewBox="0 0 400 70" style="width:100%;height:auto;margin-top:6px">
+          <text x="0" y="40" class="tb">總成本 =</text>
+          <use href="#i-person" x="78" y="20" width="14" height="26" class="cR"/><text x="98" y="40" class="tx">漏掉 × 權重</text>
+          <text x="186" y="40" class="tb">＋</text>
+          <use href="#i-cam" x="206" y="24" width="28" height="20" class="cB"/><text x="240" y="40" class="tx">亂轉 × 懲罰</text>
+          <text x="200" y="64" text-anchor="middle" class="ts">→ 讓總成本最小：別漏人，也別讓鏡頭白轉</text>
+        </svg>
+        <span class="con">缺點：</span>追蹤群體時可能漏掉新入侵者。</div>
+    </div>
+  </div>
+
+  <!-- ===== AGRICULTURE ===== -->
+  <div class="pane" id="pAgri">
+    <h3>NDVI：用「看不見的光」判斷作物健不健康 <span class="ref">[36]</span></h3>
+    <p>健康葉子會<b>吃掉紅光</b>（拿去做光合作用）、<b>強力反射近紅外光（NIR）</b>。生病或枯萎時剛好相反。所以只要多光譜相機同時量這兩種光，代入公式就能把整片田變成「健康地圖」，在肉眼看出來之前就發現病害。</p>
+    <div class="fig" id="ndviFig">
+      <div class="fig-h"><span class="tag int">互動</span><span class="tag flow">流程</span>拉滑桿改變葉子健康度</div>
+      <div class="sv"><svg viewBox="0 0 820 290" id="ndvi"></svg></div>
+      <div class="ctrl"><label>葉子健康度 <input type="range" id="ndviH" min="0" max="100" value="85"><b id="ndviHv">85%</b></label></div>
+    </div>
+    <div class="fig" id="fieldFig">
+      <div class="fig-h"><span class="tag anim">動畫</span>無人機掃過田地：肉眼看 vs NDVI 看</div>
+      <div class="sv"><svg viewBox="0 0 820 225" id="field"></svg></div>
+      <div class="ctrl"><button class="pri" id="fieldBtn">▶ 播放</button><span class="cap">左半邊是一般相機看到的（都綠綠的），掃過之後換成 NDVI 顏色，病區就現形了。</span></div>
+    </div>
+
+    <h3>農業 IoT 的資安：CNN-LSTM 入侵偵測 <span class="ref">[39]</span></h3>
+    <p>農田感測器、無人機都連網，就可能被駭。這篇用 <b>CNN</b>（看局部形狀）＋<b>LSTM</b>（看前後順序）分析網路流量，最後用 <b>Softmax</b> 把分數轉成「正常/攻擊」的機率；CNN 先濃縮資料，也解決了時間序列參數爆炸的問題。另提到用區塊鏈保護資料完整性。</p>
+    <div class="fig" id="cnnFig">
+      <div class="fig-h"><span class="tag anim">動畫</span><span class="tag flow">流程</span>一段流量怎麼變成「攻擊機率」</div>
+      <div class="sv"><svg viewBox="0 0 820 240" id="cnn"></svg></div>
+      <div class="ctrl"><button class="pri" id="cnnN">▶ 正常流量</button><button class="pri" id="cnnA">▶ 可疑流量</button><span class="cap" id="cnnCap"></span></div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card small"><b>精準農業與病蟲害 <span class="ref">[37]</span></b><br>早期發現病害、比較各機型；混合型無人機兼顧航程與懸停。實測 WiFi 約 200 m、控制半徑 37 m。<br><span class="con">缺點：</span>初期成本高，農民需要影像判讀知識。</div>
+      <div class="card small"><b>農業應用總覽 <span class="ref">[38]</span></b><br>作物監測、生物量與林木估算、牲畜監看、土壤分析；飛控用 PID（見軍事分頁互動）。<br><span class="con">缺點：</span>成本高、法規限制、續航與酬載受限。</div>
+    </div>
+  </div>
+
+  <!-- ===== MILITARY ===== -->
+  <div class="pane" id="pMil">
+    <h3>PID 控制：讓無人機穩穩停在指定高度 <span class="ref">[38][40][42][44]</span></h3>
+    <p>好幾篇軍事研究（例如用 ROS 控制 Parrot Bebop 2）的飛控核心都是 <b>PID</b>。它只看「目標和現在差多少（誤差）」，用三招決定推力：</p>
+    <div class="fig" id="pidFig">
+      <div class="fig-h"><span class="tag flow">流程</span><span class="tag anim">動畫</span>回授控制迴路</div>
+      <div class="sv"><svg viewBox="0 0 820 200" id="pidLoop"></svg></div>
+      <div class="fig-h" style="margin-top:8px"><span class="tag int">互動</span>調三個旋鈕，看無人機怎麼升到 10 公尺</div>
+      <div class="sv"><svg viewBox="0 0 820 260" id="pid"></svg></div>
+      <div class="ctrl">
+        <label>P <input type="range" id="kp" min="0" max="10" step="0.1" value="3"><b id="kpv">3.0</b></label>
+        <label>I <input type="range" id="ki" min="0" max="4" step="0.05" value="0"><b id="kiv">0.00</b></label>
+        <label>D <input type="range" id="kd" min="0" max="6" step="0.1" value="0"><b id="kdv">0.0</b></label>
+      </div>
+      <div class="ctrl"><button data-k="3,0,0">只有 P</button><button data-k="3,0,2.2">P＋D</button><button data-k="3,1,2.2">P＋I＋D</button></div>
+      <p class="cap" id="pidCap"></p>
+    </div>
+
+    <h3>雙鏡頭抓無人機＋卡爾曼濾波 <span class="ref">[6]</span></h3>
+    <div class="fig">
+      <div class="fig-h"><span class="tag flow">流程</span>廣角找、變焦認、卡爾曼追</div>
+      <div class="sv"><svg viewBox="0 0 820 130">
+        <use href="#i-cam" x="20" y="44" width="44" height="32" class="cB"/><path d="M64 60L150 22V98Z" class="fB" opacity=".12"/><circle cx="128" cy="52" r="2.5" class="fF"/><text x="42" y="116" text-anchor="middle" class="ts">廣角固定鏡頭</text><text x="128" y="116" text-anchor="middle" class="ts">發現小點</text>
+        <path d="M160 60H215" class="ln" marker-end="url(#ah)"/>
+        <use href="#i-cam" x="226" y="44" width="44" height="32" class="cP"/><path d="M270 60L340 50V70Z" class="fP" opacity=".2"/><circle cx="350" cy="60" r="12" class="nd"/><use href="#i-quad" x="340" y="54" width="20" height="12" class="cF"/><text x="290" y="116" text-anchor="middle" class="ts">轉台變焦鏡頭放大</text>
+        <path d="M368 60H420" class="ln" marker-end="url(#ah)"/>
+        <g class="fP"><circle cx="440" cy="46" r="5"/><circle cx="440" cy="74" r="5"/><circle cx="465" cy="40" r="5"/><circle cx="465" cy="60" r="5"/><circle cx="465" cy="80" r="5"/><circle cx="490" cy="60" r="5"/></g><text x="465" y="116" text-anchor="middle" class="ts">多幀深度學習：是無人機？</text>
+        <path d="M505 60H560" class="ln" marker-end="url(#ah)"/>
+        <path d="M575 80C610 30 650 90 690 40" stroke="var(--orange)" stroke-width="3" fill="none"/><g class="fO"><circle cx="590" cy="66" r="3"/><circle cx="620" cy="58" r="3"/><circle cx="650" cy="68" r="3"/><circle cx="676" cy="50" r="3"/></g><text x="632" y="116" text-anchor="middle" class="ts">卡爾曼濾波持續追</text>
+        <path d="M705 60H745" class="ln" marker-end="url(#ah)"/><text x="752" y="56" class="tb fR">保護</text><text x="752" y="74" class="ts">關鍵設施</text>
+      </svg></div>
+      <div class="fig-h" style="margin-top:10px"><span class="tag int">互動</span>卡爾曼濾波：把「預測」和「量測」聰明地平均</div>
+      <div class="sv"><svg viewBox="0 0 820 120" id="kfFlow"></svg></div>
+      <div class="sv"><svg viewBox="0 0 820 240" id="kf"></svg></div>
+      <div class="ctrl"><label>量測雜訊（鏡頭多抖） <input type="range" id="kfN" min="2" max="40" value="18"><b id="kfNv">18</b></label><button class="pri" id="kfBtn">▶ 重跑</button><span class="cap" id="kfCap"></span></div>
+    </div>
+
+    <h3>其他軍事研究</h3>
+    <div class="grid g2">
+      <div class="fig" style="margin:0" id="slamFig">
+        <div class="fig-h"><span class="tag anim">動畫</span>腦波操控偵察機 <span class="ref">[42]</span></div>
+        <div class="sv narrow"><svg viewBox="0 0 400 230" id="slam"></svg></div>
+        <p class="cap">特戰用小四軸：TGAM 晶片讀<b>腦電波（EEG）</b>算出專注度，超過門檻就前進——不用手。同時用 <b>RPLIDAR</b> 雷射掃描（上圖）邊飛邊畫地圖（<b>SLAM</b>），自己閃障礙、規劃路線。<span class="con">缺點：</span>依賴腦波訊號品質。</p>
+      </div>
+      <div class="card small">
+        <p><b>GoogLeNet＋單類 SVM 異常偵測 <span class="ref">[41]</span></b><br>預訓練 CNN 抽特徵，單類 SVM 學「正常行為」的邊界——原理同<a href="#anomFig">上面的異常偵測動畫</a>。難點：光線變化、鏡頭晃動、缺乏標準資料集。</p>
+        <p><b>IoT 無人機網路 <span class="ref">[43]</span></b><br>每台裝 GPS（定位）＋高解析鏡頭＋GSM（回傳中控），再加波束掃描雷達。多機合作涵蓋比單機大。<span class="con">缺點：</span>GSM 耗電、怕天氣。</p>
+        <p><b>智慧軍用無人機 <span class="ref">[44]</span></b><br>YOLOv4-tiny 物件偵測＋強化學習，在模擬中研究偵察任務。<span class="con">缺點：</span>缺少真實環境驗證。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== URBAN ===== -->
+  <div class="pane" id="pUrban">
+    <h3>城市監控路線規劃：ALNS 演算法 <span class="ref">[45]/[48]</span></h3>
+    <p>要決定：<b>充電站蓋哪、每台走哪條路、每個點多久巡一次</b>，還要最省錢（MDLRP-UM 問題）。精確解法（MIQCP 數學模型）在大城市會算不完，所以作者用<b>自適應大鄰域搜尋（ALNS）</b>：反覆「<b>拆掉一部分路線 → 重新補好 → 比較變好沒</b>」，而且好用的拆法會越來越常被選中（這就是「自適應」）。下面是 ALNS 核心概念的簡化示範。</p>
+    <div class="fig" id="alnsFig">
+      <div class="fig-h"><span class="tag anim">動畫</span>拆 → 補 → 比較 → 調整策略權重</div>
+      <div class="sv"><svg viewBox="0 0 820 320" id="alns"></svg></div>
+      <div class="ctrl"><button class="pri" id="alnsBtn">▶ 播放</button><span class="cap" id="alnsCap"></span></div>
+    </div>
+
+    <h3>搭公車充電的交通巡查無人機 <span class="ref">[49][50]</span></h3>
+    <p>無人機電池不夠一直飛？那就<b>停在公車上充電</b>，到了需要看的路段再起飛。每條路「多久沒被看」會讓資訊價值流失（越久沒看，交通資料越不準）；演算法（TAOP-DP 團隊弧定向問題，用啟發式＋混合整數線性規劃 MILP 求解）要決定：<b>電量有限下，先看哪些路最划算</b>。另一篇再加上 <b>SfM</b>（從多張空拍重建 3D）。在 Sioux Falls 路網模擬驗證。</p>
+    <div class="fig" id="busFig">
+      <div class="fig-h"><span class="tag anim">動畫</span>公車＝移動充電站</div>
+      <div class="sv"><svg viewBox="0 0 820 300" id="bus"></svg></div>
+      <p class="cap">路段顏色：<b style="color:var(--green)">綠＝剛看過</b> → <b style="color:var(--red)">紅＝很久沒看（資訊流失）</b>。注意有兩段路一直沒去 —— 電量有限，只能挑最有價值的。</p>
+    </div>
+
+    <div class="fig">
+      <div class="fig-h"><span class="tag anim">動畫</span>SfM（運動恢復結構）：多張照片 → 3D 模型</div>
+      <div class="sv"><svg viewBox="0 0 820 170">
+        <g><path d="M330 150V90L380 70L430 90V150Z" class="fS" stroke="var(--muted)"/><path d="M330 90L380 110L430 90M380 110V170" stroke="var(--muted)" fill="none"/></g>
+        <g class="cB"><use href="#i-quad" x="240" y="10" width="44" height="26"/><use href="#i-quad" x="358" y="0" width="44" height="26"/><use href="#i-quad" x="476" y="10" width="44" height="26"/></g>
+        <g stroke="var(--orange)" stroke-width="1.4" stroke-dasharray="3 3"><path d="M262 30L330 90M262 30L380 70M262 30L380 110"><animate attributeName="opacity" values="0;1;0" dur="2.4s" repeatCount="indefinite"/></path><path d="M380 20L330 90M380 20L380 70M380 20L430 90"><animate attributeName="opacity" values="0;1;0" dur="2.4s" begin=".8s" repeatCount="indefinite"/></path><path d="M498 30L430 90M498 30L380 70M498 30L380 110"><animate attributeName="opacity" values="0;1;0" dur="2.4s" begin="1.6s" repeatCount="indefinite"/></path></g>
+        <g class="fO"><circle cx="330" cy="90" r="4"/><circle cx="380" cy="70" r="4"/><circle cx="430" cy="90" r="4"/><circle cx="380" cy="110" r="4"/></g>
+        <text x="150" y="80" text-anchor="end" class="tx">從不同角度拍</text><text x="150" y="98" text-anchor="end" class="ts">找出同一個角落</text>
+        <path d="M540 100H600" class="ln" marker-end="url(#ah)"/>
+        <g class="fB">
+          <circle cx="640" cy="130" r="2.5"/><circle cx="640" cy="110" r="2.5"/><circle cx="640" cy="90" r="2.5"/><circle cx="660" cy="82" r="2.5"/><circle cx="680" cy="74" r="2.5"/><circle cx="700" cy="82" r="2.5"/><circle cx="720" cy="90" r="2.5"/><circle cx="720" cy="110" r="2.5"/><circle cx="720" cy="130" r="2.5"/><circle cx="680" cy="98" r="2.5"/><circle cx="680" cy="118" r="2.5"/><circle cx="680" cy="138" r="2.5"/><circle cx="660" cy="104" r="2.5"/><circle cx="700" cy="104" r="2.5"/>
+        </g>
+        <text x="680" y="162" text-anchor="middle" class="ts">三角定位 → 3D 點雲</text>
+      </svg></div>
+    </div>
+
+    <div class="grid g3">
+      <div class="card small"><b>智慧城市無人機回顧 <span class="ref">[46]</span></b><br>歸納 7 個研究領域，最多的是<b>空汙</b>與<b>交通</b>監測；多數用「單台旋翼＋相機」，搭 IoT 與 AI。</div>
+      <div class="card small"><b>反無人機偵測 <span class="ref">[47]</span></b><br>在城市抓「別人的」無人機：<b>無線電（RF）、聲音、影像</b>三種被動感測；評估大連理工 DUT 反無人機系統的邊緣運算效果。<span class="con">缺點：</span>資料量大、遠距聲學定位不準。</div>
+      <div class="card small"><b>無人機＋AI 維護治安 <span class="ref">[49]</span></b><br>即時抓威脅、提升警方掌握度；但引發<b>隱私與公民自由</b>疑慮，呼籲完整法規與公共討論。</div>
+    </div>
+  </div>
+
+  <h3>四大領域一覽（論文表 5 濃縮）</h3>
+  <div class="tw"><table class="t">
+    <tr><th>領域</th><th>常用機型</th><th>常用方法/技術</th><th>主要痛點</th></tr>
+    <tr><td><b>邊境</b></td><td>四軸、固定翼、Predator、自主機</td><td>啟發式排程、MINLP、多準則決策、YOLO、強化學習；WSN、RFID、雷達、雲台相機</td><td>電池要常換、需人工介入、感測器易損、成本</td></tr>
+    <tr><td><b>農業</b></td><td>自主機、輕於空氣、單旋翼、混合 VTOL、固定翼</td><td>NDVI、機器學習、PID、CNN-LSTM、深度 Q 網路；WSN、GIS、5G</td><td>影像解析度、依賴 GPS、初期成本高、資安</td></tr>
+    <tr><td><b>軍事戰術</b></td><td>四軸、固定翼、軍用機</td><td>PID、目標追蹤、卡爾曼、GoogLeNet、YOLOv4-tiny、強化學習；ROS、雷達、腦控</td><td>法律倫理、環境適應、能源效率、缺實地驗證</td></tr>
+    <tr><td><b>城市</b></td><td>多旋翼、四軸、混合</td><td>SfM、ALNS、TAOP-DP、電腦視覺、YOLO；IoT、區塊鏈、RF 感測</td><td>隱私、通訊複雜、規模化、電池</td></tr>
+  </table></div>
+</section>
+
+<script>
+/* tabs */
+(function(){const tabs=document.querySelectorAll('#appTabs button');tabs.forEach(b=>b.onclick=()=>{tabs.forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('#apps .pane').forEach(p=>p.classList.toggle('show',p.id===b.dataset.p));});})();
+
+/* WSN border */
+(function(){
+  const svg=document.getElementById('wsn');const cap=document.getElementById('wsnCap');
+  S('rect',{x:0,y:0,width:820,height:118,fill:'var(--red-s)',opacity:.5},svg);T(svg,12,20,'境外','ts');T(svg,12,140,'境內','ts');
+  S('line',{x1:0,y1:118,x2:820,y2:118,stroke:'var(--red)','stroke-width':2,'stroke-dasharray':'8 5'},svg);T(svg,808,110,'國界','ts',{'text-anchor':'end',fill:'var(--red)'});
+  const SX=[];for(let x=60;x<=720;x+=60)SX.push(x);
+  const sens=SX.map(x=>{const g=S('g',{},svg);const ring=S('circle',{cx:x,cy:140,r:14,fill:'none',stroke:'var(--red)','stroke-width':2,opacity:0},g);S('circle',{cx:x,cy:140,r:6,class:'fT'},g);return ring;});
+  T(svg,60,166,'地面感測器（WSN）','ts');
+  U(svg,'i-tower',770,206,34,42,'cO');T(svg,770,246,'指揮中心','ts',{'text-anchor':'middle'});
+  const intr=U(svg,'i-person',0,0,16,30,'cR');
+  const msg=S('circle',{r:6,fill:'var(--red)',opacity:0},svg);
+  const cone=S('path',{fill:'var(--amber)',opacity:0},svg);
+  const drone=U(svg,'i-quad',0,0,46,27,'cB');const dl=T(svg,0,0,'','ts',{fill:'var(--blue)','font-weight':700});
+  const IX=300;const hop=[];for(const x of SX)if(x>=IX)hop.push([x,140]);hop.push([770,206]);
+  let t0=performance.now();const D0=[700,214];
+  function f(now){const t=((now-t0)/1000)%11;
+    let iy=t<2.4?10+t/2.4*140:150+(t-2.4)*4;let ix=IX+(t>2.4?(t-2.4)*6:0);intr.setAttribute('x',ix-8);intr.setAttribute('y',iy-15);
+    const trig=t>2.0;sens.forEach((r,i)=>{r.setAttribute('opacity',trig&&SX[i]===IX?(0.5+0.5*Math.sin(t*12)):0);});
+    if(t>2.0&&t<4.2){const p=(t-2.0)/2.2*(hop.length-1);const k=Math.min(hop.length-2,Math.floor(p));const fr=p-k;msg.setAttribute('opacity',1);msg.setAttribute('cx',hop[k][0]+(hop[k+1][0]-hop[k][0])*fr);msg.setAttribute('cy',hop[k][1]+(hop[k+1][1]-hop[k][1])*fr);}else msg.setAttribute('opacity',0);
+    let dx=D0[0],dy=D0[1];if(t>4.4){const p=Math.min(1,(t-4.4)/2.2);const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;dx=D0[0]+(ix-D0[0])*e;dy=D0[1]+(iy-70-D0[1])*e;}
+    drone.setAttribute('x',dx-23);drone.setAttribute('y',dy-13);
+    if(t>6.6){cone.setAttribute('opacity',.3);cone.setAttribute('d',`M${dx} ${dy+6}L${ix-26} ${iy+22}H${ix+26}Z`);dl.textContent='📹 即時影像回傳';dl.setAttribute('x',dx+28);dl.setAttribute('y',dy);}else{cone.setAttribute('opacity',0);dl.textContent='';}
+    cap.innerHTML=t<2?'① 有人越過國界…':t<4.3?'② 附近感測器發現 → 訊息<b>一站接一站</b>傳回指揮中心（多跳傳輸）':t<6.6?'③ 排程演算法挑最合適的無人機，起飛前往':'④ 抵達上空，即時錄影並持續追蹤入侵者';
+    requestAnimationFrame(f);}
+  onVisible(document.getElementById('wsnFig'),()=>{t0=performance.now();requestAnimationFrame(f);});
+})();
+
+/* Pareto */
+(function(){
+  const svg=document.getElementById('pareto');const cap=document.getElementById('paretoCap');
+  const BX0=40,BX1=780,BY=50;
+  T(svg,BX0,22,'邊境（示意）','ts');S('line',{x1:BX0,x2:BX1,y1:BY,y2:BY,stroke:'var(--line)','stroke-width':8,'stroke-linecap':'round'},svg);
+  const segG=S('g',{},svg),drG=S('g',{},svg);
+  const PX=v=>90+v/90*400,PY=v=>290-(v-4)/10*150;
+  S('line',{x1:PX(0),x2:PX(90),y1:PY(4),y2:PY(4),stroke:'var(--muted)'},svg);S('line',{x1:PX(0),x2:PX(0),y1:PY(4),y2:PY(14),stroke:'var(--muted)'},svg);
+  T(svg,PX(90),PY(4)+22,'充電線長度（佔邊境 %）→ 越長越貴','ts',{'text-anchor':'end'});T(svg,PX(0)-8,PY(14)-6,'無人機台數 ↑ 越多越貴','ts');
+  [0,30,60,90].forEach(v=>T(svg,PX(v),PY(4)+12,v+'%','ts',{'text-anchor':'middle'}));[4,6,8,10,12,14].forEach(v=>T(svg,PX(0)-6,PY(v)+4,v,'ts',{'text-anchor':'end'}));
+  const par=[[15,12],[25,9],[40,7],[55,6],[75,5]],dom=[[30,11],[50,9],[65,8],[20,13],[45,10],[80,7],[35,10]];
+  S('path',{d:'M'+par.map(p=>PX(p[0])+' '+PY(p[1])).join('L'),stroke:'var(--orange)','stroke-width':2,fill:'none','stroke-dasharray':'5 4'},svg);
+  dom.forEach(p=>S('circle',{cx:PX(p[0]),cy:PY(p[1]),r:6,fill:'var(--muted)',opacity:.45},svg));
+  const pEls=par.map((p,i)=>{const c=S('circle',{cx:PX(p[0]),cy:PY(p[1]),r:9,fill:'var(--orange)',style:'cursor:pointer'},svg);c.onclick=()=>sel(i);return c;});
+  T(svg,PX(dom[3][0])+12,PY(dom[3][1])+4,'被打敗的方案','ts');T(svg,PX(par[2][0])+14,PY(par[2][1])-8,'Pareto 前緣','ts',{fill:'var(--orange)'});
+  const info=S('g',{},svg);
+  function sel(i){const [pct,n]=par[i];pEls.forEach((e,k)=>e.setAttribute('r',k===i?13:9));segG.innerHTML='';drG.innerHTML='';
+    const L=(BX1-BX0)*pct/100,ls=L/4;for(let k=0;k<4;k++){const c=BX0+(BX1-BX0)*(k+.5)/4;S('line',{x1:c-ls/2,x2:c+ls/2,y1:BY,y2:BY,stroke:'var(--amber)','stroke-width':8,'stroke-linecap':'round'},segG);}
+    for(let k=0;k<n;k++)U(drG,'i-quad',BX0+20+k*((BX1-BX0-40)/(n-1||1)),BY+26,26,15,'cB');
+    info.innerHTML='';T(info,560,150,'目前選的方案','ts');T(info,560,180,'充電線 '+pct+'%','tb',{fill:'var(--amber)'});T(info,560,206,'無人機 '+n+' 台','tb',{fill:'var(--blue)'});
+    T(info,560,236,i===0?'充電線最短，但要最多無人機':i===4?'無人機最少，但充電線最長':'兩者折衷','ts');T(info,560,256,'→ 沒有「唯一最好」，看預算偏好挑','ts');}
+  sel(1);
+})();
+
+/* MPSI-SPOTIS */
+(function(){
+  const fl=document.getElementById('mcdaFlow');
+  const st=[['決策表','方案×指標'],['正規化','都變 0~1'],['算權重','差異大→重要'],['量距離','離理想點多遠'],['排名','越近越好']];
+  st.forEach(([a,b],i)=>{const x=70+i*168;S('circle',{cx:x,cy:44,r:30,class:'nd'},fl);T(fl,x,100,a,'tx',{'text-anchor':'middle','font-weight':700});T(fl,x,116,b,'ts',{'text-anchor':'middle'});if(i<4)S('path',{d:`M${x+34} 44H${x+132}`,class:'ln','marker-end':'url(#ah)'},fl);
+    const g=S('g',{},fl);
+    if(i===0){for(let r=0;r<3;r++)for(let c=0;c<3;c++)S('rect',{x:x-15+c*10,y:30+r*10,width:9,height:9,fill:'var(--blue)',opacity:.3+.2*((r+c)%3)},g);}
+    if(i===1){[.3,.8,.55].forEach((v,k)=>S('rect',{x:x-15+k*11,y:58-v*28,width:8,height:v*28,fill:'var(--teal)'},g));S('line',{x1:x-18,x2:x+18,y1:30,y2:30,stroke:'var(--muted)','stroke-dasharray':'2 2'},g);}
+    if(i===2){[.4,.9,.6].forEach((v,k)=>S('rect',{x:x-15+k*11,y:60-v*30,width:8,height:v*30,fill:'var(--orange)'},g));}
+    if(i===3){[16,10,4].forEach((r,k)=>S('circle',{cx:x,cy:44,r,fill:'none',stroke:'var(--red)','stroke-width':1.5},g));S('circle',{cx:x+11,cy:38,r:3,fill:'var(--fg)'},g);S('line',{x1:x,y1:44,x2:x+11,y2:38,stroke:'var(--fg)'},g);}
+    if(i===4){S('rect',{x:x-6,y:30,width:12,height:28,fill:'var(--amber)'},g);S('rect',{x:x-19,y:40,width:12,height:18,fill:'var(--muted)'},g);S('rect',{x:x+7,y:46,width:12,height:12,fill:'var(--orange)',opacity:.7},g);}
+  });
+  const crit=[{n:'航程 km',b:1,lo:0,hi:250},{n:'價格 萬美元',b:0,lo:0,hi:100},{n:'續航 小時',b:1,lo:0,hi:24}];
+  const base=[['A',120,50,10],['B',80,20,6],['C',200,70,18],['D',60,15,4]];const NEW=['E',150,40,12];
+  const cols=['var(--blue)','var(--purple)','var(--teal)','var(--orange)','var(--green)'];
+  // MPSI weights from base (fixed)
+  const w=crit.map((c,j)=>{const v=base.map(a=>a[j+1]);const mx=Math.max(...v),mn=Math.min(...v);const nrm=v.map(x=>c.b?x/mx:mn/x);const m=nrm.reduce((s,x)=>s+x,0)/nrm.length;return nrm.reduce((s,x)=>s+(x-m)*(x-m),0);});
+  const ws=w.reduce((a,b)=>a+b,0);const W=w.map(x=>x/ws);
+  const score=a=>crit.reduce((s,c,j)=>{const ideal=c.b?c.hi:c.lo;return s+W[j]*Math.abs(a[j+1]-ideal)/(c.hi-c.lo);},0);
+  const tbl=document.getElementById('mcdaTbl');const svg=document.getElementById('mcda');const cap=document.getElementById('mcdaCap');
+  let alts=base.slice();
+  function render(){
+    tbl.innerHTML='<tr><th>方案</th>'+crit.map(c=>'<th>'+c.n+(c.b?'（越大越好）':'（越小越好）')+'</th>').join('')+'</tr>'+alts.map((a,i)=>'<tr'+(a[0]==='E'?' style="background:var(--green-s)"':'')+'><td><b style="color:'+cols[i]+'">'+a[0]+'</b></td>'+a.slice(1).map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('')+'<tr><td class="muted">理想點</td>'+crit.map(c=>'<td class="muted">'+(c.b?c.hi:c.lo)+'</td>').join('')+'</tr>';
+    svg.innerHTML='';T(svg,20,22,'① MPSI 權重（差異越大越重要）','tx',{'font-weight':700});
+    crit.forEach((c,j)=>{const y=40+j*34;T(svg,20,y+15,c.n,'ts');S('rect',{x:120,y,width:W[j]*400,height:20,rx:4,fill:'var(--orange)'},svg);T(svg,126+W[j]*400,y+15,(W[j]*100).toFixed(0)+'%','tx');});
+    T(svg,420,22,'② SPOTIS 距離（越短越好）','tx',{'font-weight':700});
+    const ranked=alts.map((a,i)=>({a,i,s:score(a)})).sort((x,y)=>x.s-y.s);
+    ranked.forEach((r,k)=>{const y=36+k*40;T(svg,420,y+19,'第'+(k+1),'ts');T(svg,456,y+19,r.a[0],'tb',{fill:cols[r.i]});const bar=S('rect',{x:478,y:y+4,width:0,height:22,rx:4,fill:cols[r.i]},svg);T(svg,484+r.s*500,y+20,r.s.toFixed(3),'ts');tween(600,t=>bar.setAttribute('width',r.s*500*t));});
+  }
+  render();cap.innerHTML='權重：價格最重要（各方案價差最大）。目前排名 C → B → A → D。';
+  document.getElementById('mcdaAdd').onclick=()=>{if(alts.length>4)return;alts=base.concat([NEW]);render();cap.innerHTML='加入 E 之後：A、B、C、D 的分數<b>一模一樣</b>，E 只是插進第 2 名 —— 舊排名沒被打亂（因為理想點是事先固定的）。';};
+  document.getElementById('mcdaReset').onclick=()=>{alts=base.slice();render();cap.innerHTML='目前排名 C → B → A → D。';};
+})();
+
+/* NDVI */
+(function(){
+  const svg=document.getElementById('ndvi');const h=document.getElementById('ndviH'),hv=document.getElementById('ndviHv');
+  S('circle',{cx:60,cy:50,r:24,class:'fA'},svg);T(svg,60,92,'陽光','ts',{'text-anchor':'middle'});
+  S('path',{d:'M84 66L196 150',stroke:'var(--amber)','stroke-width':4,'marker-end':'url(#ahO)'},svg);
+  const leaf=S('path',{d:'M170 200C170 150 230 130 270 150C260 200 220 215 170 200Z'},svg);S('path',{d:'M172 199L262 153',stroke:'var(--card)','stroke-width':1.5,opacity:.6},svg);T(svg,222,232,'葉子','ts',{'text-anchor':'middle'});
+  const rRed=S('path',{d:'M236 150L368 72',stroke:'#e04848',fill:'none','marker-end':'url(#ahR)'},svg);
+  const rNir=S('path',{d:'M250 160L380 92',stroke:'var(--purple)',fill:'none'},svg);
+  T(svg,286,92,'紅光','ts',{fill:'#e04848'});T(svg,330,140,'近紅外光','ts',{fill:'var(--purple)'});
+  U(svg,'i-cam',410,80,52,38,'cF');T(svg,410,116,'多光譜相機','ts',{'text-anchor':'middle'});
+  const bR=S('rect',{x:470,width:22,rx:3,fill:'#e04848'},svg),bN=S('rect',{x:500,width:22,rx:3,fill:'var(--purple)'},svg);
+  T(svg,481,196,'紅','ts',{'text-anchor':'middle'});T(svg,511,196,'NIR','ts',{'text-anchor':'middle'});const tR=T(svg,481,0,'','ts',{'text-anchor':'middle'}),tN=T(svg,511,0,'','ts',{'text-anchor':'middle'});
+  S('path',{d:'M536 130H570',class:'ln','marker-end':'url(#ah)'},svg);
+  // formula as fraction
+  T(svg,580,60,'NDVI =','tb');
+  const num=T(svg,700,92,'','tx',{'text-anchor':'middle'});S('line',{x1:630,x2:770,y1:102,y2:102,stroke:'var(--fg)','stroke-width':1.5},svg);const den=T(svg,700,124,'','tx',{'text-anchor':'middle'});
+  T(svg,700,74,'NIR − 紅','ts',{'text-anchor':'middle'});T(svg,700,142,'NIR ＋ 紅','ts',{'text-anchor':'middle'});
+  const res=T(svg,700,180,'','tbig',{'text-anchor':'middle'});
+  const SX=560,SW=240,SY=230;const grad=S('linearGradient',{id:'ndviG'},svg);[['0','#8b5a2b'],['.35','#d6b13a'],['.6','#8fc04a'],['1','#1e8a3e']].forEach(([o,c])=>S('stop',{offset:o,'stop-color':c},grad));
+  S('rect',{x:SX,y:SY,width:SW,height:14,rx:7,fill:'url(#ndviG)'},svg);T(svg,SX,SY+30,'−0.2 枯/土','ts');T(svg,SX+SW,SY+30,'1 很健康','ts',{'text-anchor':'end'});
+  const mk=S('path',{fill:'var(--fg)'},svg);
+  function col(v){const stops=[[-0.2,[139,90,43]],[0.22,[214,177,58]],[0.52,[143,192,74]],[1,[30,138,62]]];for(let i=0;i<3;i++){const [a,ca]=stops[i],[b,cb]=stops[i+1];if(v<=b||i===2){const t=Math.max(0,Math.min(1,(v-a)/(b-a)));return 'rgb('+ca.map((c,k)=>Math.round(c+(cb[k]-c)*t)).join(',')+')';}}}
+  window.ndviColor=col;
+  function upd(){const x=h.value/100;hv.textContent=h.value+'%';const nir=0.25+0.35*x,red=0.2-0.15*x;const v=(nir-red)/(nir+red);
+    leaf.setAttribute('fill',col(v));rRed.setAttribute('stroke-width',1+red*40);rNir.setAttribute('stroke-width',1+nir*14);
+    bR.setAttribute('height',red*160);bR.setAttribute('y',180-red*160);bN.setAttribute('height',nir*160);bN.setAttribute('y',180-nir*160);tR.setAttribute('y',174-red*160);tR.textContent=red.toFixed(2);tN.setAttribute('y',174-nir*160);tN.textContent=nir.toFixed(2);
+    num.textContent=nir.toFixed(2)+' − '+red.toFixed(2);den.textContent=nir.toFixed(2)+' ＋ '+red.toFixed(2);res.textContent='= '+v.toFixed(2);res.setAttribute('fill',col(v));
+    const mx=SX+(v+0.2)/1.2*SW;mk.setAttribute('d',`M${mx} ${SY-2}l-6 -10h12z`);}
+  h.addEventListener('input',upd);upd();
+})();
+/* field scan */
+(function(){
+  const svg=document.getElementById('field');const C=30,cols=24,rows=5,ox=50,oy=40;
+  const r=rng(21);const cells=[];
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const d=Math.hypot((i-15)/3.2,(j-2.4)/1.6);let v=0.72+r()*0.12;if(d<1)v=0.05+d*0.25+r()*0.08;else if(d<1.6)v=0.35+r()*0.15;const g=0.55+r()*0.1+(v<0.3?-0.04:0);
+    cells.push({i,v,el:S('rect',{x:ox+i*C,y:oy+j*C,width:C-1,height:C-1,fill:`hsl(${100+r()*12},38%,${(d<1.2?44:40)+r()*6}%)`},svg)});}
+  T(svg,ox,oy+rows*C+26,'田地（每格一小塊）','ts');
+  const dr=U(svg,'i-quad',0,0,40,24,'cB');const scan=S('rect',{y:oy-4,width:4,height:rows*C+8,fill:'var(--blue)',opacity:.6},svg);
+  const lab=T(svg,ox+cols*C,oy+rows*C+26,'','tb',{'text-anchor':'end',fill:'var(--red)'});
+  const go=player(document.getElementById('fieldBtn'),async W=>{cells.forEach(c=>c.el.setAttribute('fill',c.el.dataset.o||(c.el.dataset.o=c.el.getAttribute('fill'))));lab.textContent='';
+    await tween(5000,t=>{const x=ox+t*cols*C;scan.setAttribute('x',x-2);dr.setAttribute('x',x-20);dr.setAttribute('y',oy-30);cells.forEach(c=>{if(ox+c.i*C+C/2<x)c.el.setAttribute('fill',window.ndviColor(c.v));});},t=>t);
+    lab.textContent='⚠ 這一區作物有問題 → 派人去看、精準噴藥';});
+  onVisible(document.getElementById('fieldFig'),go,.5);
+})();
+/* CNN-LSTM */
+(function(){
+  const svg=document.getElementById('cnn');const cap=document.getElementById('cnnCap');
+  const lab=[[80,'原始流量序列'],[250,'卷積：抓局部形狀'],[400,'池化：濃縮'],[560,'LSTM：看前後順序'],[730,'Softmax：轉成機率']];
+  lab.forEach(([x,t])=>T(svg,x,226,t,'ts',{'text-anchor':'middle'}));
+  [[150,190],[330,360],[450,480],[640,670]].forEach(([a,b])=>S('path',{d:`M${a} 120H${b}`,class:'ln','marker-end':'url(#ah)'},svg));
+  const inB=[],cvB=[],plB=[],cells=[];
+  for(let i=0;i<12;i++)inB.push(S('rect',{x:20+i*10,width:7,rx:1.5,fill:'var(--teal)'},svg));
+  for(let i=0;i<10;i++)cvB.push(S('rect',{x:200+i*10,width:7,rx:1.5,fill:'var(--blue)'},svg));
+  for(let i=0;i<5;i++)plB.push(S('rect',{x:376+i*14,width:10,rx:2,fill:'var(--purple)'},svg));
+  const ker=S('rect',{y:40,width:30,height:160,fill:'none',stroke:'var(--orange)','stroke-width':2,rx:3,opacity:0},svg);
+  for(let i=0;i<4;i++){const x=505+i*38;if(i<3)S('path',{d:`M${x+13} 120H${x+25}`,class:'ln','marker-end':'url(#ah)'},svg);cells.push(S('circle',{cx:x,cy:120,r:13,class:'nd'},svg));}
+  S('path',{d:'M505 96H619',stroke:'var(--muted)','stroke-dasharray':'3 3'},svg);T(svg,562,88,'記憶','ts',{'text-anchor':'middle'});
+  const pN=S('rect',{x:690,y:84,height:20,rx:4,fill:'var(--green)'},svg),pA=S('rect',{x:690,y:136,height:20,rx:4,fill:'var(--red)'},svg);
+  T(svg,690,78,'正常','ts');T(svg,690,130,'攻擊','ts');const tN=T(svg,0,99,'','tx'),tA=T(svg,0,151,'','tx');
+  const setBar=(el,v,base,h)=>{el.setAttribute('height',v*h);el.setAttribute('y',base-v*h);};
+  async function run(seq,W){
+    const conv=[];for(let i=0;i<10;i++)conv.push(Math.min(1,Math.abs(-seq[i]+2*seq[i+1]-seq[i+2])*1.4));
+    const pool=[];for(let i=0;i<5;i++)pool.push(Math.max(conv[2*i],conv[2*i+1]));
+    const m=pool.reduce((a,b)=>a+b,0)/5;const pa=1/(1+Math.exp(-(m-0.35)*14));
+    seq.forEach((v,i)=>setBar(inB[i],v,200,150));cvB.forEach(b=>setBar(b,0,200,150));plB.forEach(b=>setBar(b,0,200,150));cells.forEach(c=>c.style.fill='');setBar(pN,0,0,0);pN.setAttribute('width',0);pA.setAttribute('width',0);tN.textContent='';tA.textContent='';
+    cap.textContent='卷積核滑過序列，專抓「突然跳一下」這種局部形狀';ker.setAttribute('opacity',1);
+    for(let i=0;i<10;i++){ker.setAttribute('x',17+i*10);setBar(cvB[i],conv[i],200,150);await W(160);}ker.setAttribute('opacity',0);
+    cap.textContent='池化：每兩格只留最大的，資料量減半';for(let i=0;i<5;i++){setBar(plB[i],pool[i],200,150);await W(160);}
+    cap.textContent='LSTM：依序讀進來，記住前面發生過什麼';for(const c of cells){c.style.fill='var(--purple-s)';await W(260);}
+    cap.innerHTML=pa>0.5?'Softmax 輸出：<b style="color:var(--red)">高機率是攻擊</b> → 發出警報':'Softmax 輸出：<b style="color:var(--green)">正常</b>，放行';
+    await tween(600,t=>{pN.setAttribute('width',(1-pa)*80*t);pA.setAttribute('width',pa*80*t);});
+    tN.setAttribute('x',696+(1-pa)*80);tN.textContent=Math.round((1-pa)*100)+'%';tA.setAttribute('x',696+pa*80);tA.textContent=Math.round(pa*100)+'%';}
+  const normal=[.42,.45,.44,.47,.46,.48,.47,.5,.49,.5,.52,.51],attack=[.3,.32,.9,.28,.33,.95,.25,.3,.92,.35,.28,.97];
+  player(document.getElementById('cnnN'),W=>run(normal,W));player(document.getElementById('cnnA'),W=>run(attack,W));
+  document.getElementById('cnnN').textContent='▶ 正常流量';
+  normal.forEach((v,i)=>setBar(inB[i],v,200,150));
+})();
+
+/* PID loop diagram */
+(function(){
+  const svg=document.getElementById('pidLoop');
+  T(svg,20,66,'目標高度','tx');T(svg,20,84,'10 m','ts');
+  S('path',{d:'M90 70H128',class:'ln','marker-end':'url(#ah)'},svg);
+  S('circle',{cx:146,cy:70,r:16,class:'nd'},svg);T(svg,146,75,'−','tb',{'text-anchor':'middle'});
+  S('path',{d:'M162 70H220',class:'ln','marker-end':'url(#ah)'},svg);T(svg,190,62,'誤差 e','ts',{'text-anchor':'middle'});
+  S('path',{d:'M224 70V26H260M224 70H260M224 70V114H260',class:'ln'},svg);
+  const pp=[[26,'P','Kp × e','現在差多少','var(--blue)'],[70,'I','Ki × 累積 e','過去累積的差','var(--orange)'],[114,'D','Kd × 變化率','變化多快（剎車）','var(--purple)']];
+  pp.forEach(([y,a,b,c,col])=>{S('circle',{cx:278,cy:y,r:16,fill:col},svg);T(svg,278,y+5,a,'tb',{'text-anchor':'middle',fill:'#fff'});T(svg,302,y+0,b,'tx');T(svg,302,y+15,c,'ts');S('path',{d:`M420 ${y}H450L470 70`,class:'ln'},svg);});
+  S('circle',{cx:486,cy:70,r:16,class:'nd'},svg);T(svg,486,75,'＋','tb',{'text-anchor':'middle'});
+  S('path',{d:'M502 70H548',class:'ln','marker-end':'url(#ah)'},svg);T(svg,525,62,'推力','ts',{'text-anchor':'middle'});
+  U(svg,'i-quad',590,70,72,42,'cB');T(svg,590,104,'馬達＋機身','ts',{'text-anchor':'middle'});
+  S('path',{d:'M630 70H700',class:'ln','marker-end':'url(#ah)'},svg);T(svg,712,66,'實際高度','tx');
+  S('path',{d:'M666 70V160H146V88',class:'ln','marker-end':'url(#ah)'},svg);T(svg,406,178,'高度感測器回報（回授）','ts',{'text-anchor':'middle'});
+  const d=S('circle',{r:5,fill:'var(--blue)'},svg);S('animateMotion',{dur:'3s',repeatCount:'indefinite',path:'M90 70H224H260H420L470 70H548H630H666V160H146V88'},d);
+})();
+/* PID sim */
+(function(){
+  const svg=document.getElementById('pid');const cap=document.getElementById('pidCap');
+  const X=t=>60+t/10*560,Y=h=>236-h/15*216;
+  for(let h=0;h<=15;h+=5){S('line',{x1:60,x2:620,y1:Y(h),y2:Y(h),stroke:'var(--line)','stroke-width':.8},svg);T(svg,52,Y(h)+4,h+'m','ts',{'text-anchor':'end'});}
+  for(let t=0;t<=10;t+=2)T(svg,X(t),252,t+'秒','ts',{'text-anchor':'middle'});
+  S('line',{x1:60,x2:620,y1:Y(10),y2:Y(10),stroke:'var(--green)','stroke-width':2,'stroke-dasharray':'6 4'},svg);T(svg,616,Y(10)-6,'目標 10 m','ts',{'text-anchor':'end',fill:'var(--green)'});
+  const path=S('path',{fill:'none',stroke:'var(--blue)','stroke-width':2.5},svg);const head=S('circle',{r:5,fill:'var(--blue)'},svg);
+  S('line',{x1:700,x2:700,y1:Y(0),y2:Y(15),stroke:'var(--line)','stroke-width':2},svg);S('line',{x1:680,x2:720,y1:Y(10),y2:Y(10),stroke:'var(--green)','stroke-width':2,'stroke-dasharray':'4 3'},svg);
+  const dr=U(svg,'i-quad',700,Y(0),56,32,'cB');S('rect',{x:660,y:Y(0),width:80,height:6,fill:'var(--muted)'},svg);
+  const kp=document.getElementById('kp'),ki=document.getElementById('ki'),kd=document.getElementById('kd');
+  function sim(){const Kp=+kp.value,Ki=+ki.value,Kd=+kd.value;let x=0,v=0,I=0;const pts=[];const dt=0.01;for(let t=0;t<=10.0001;t+=dt){const e=10-x;I+=e*dt;let u=Kp*e+Ki*I-Kd*v;u=Math.max(0,Math.min(40,u));const a=u-9.8-0.3*v;v+=a*dt;x+=v*dt;if(x<0){x=0;v=Math.max(0,v);}pts.push([t,Math.min(15,x)]);}return pts;}
+  let anim=0;
+  function run(){document.getElementById('kpv').textContent=(+kp.value).toFixed(1);document.getElementById('kiv').textContent=(+ki.value).toFixed(2);document.getElementById('kdv').textContent=(+kd.value).toFixed(1);
+    const pts=sim();const my=++anim;const final=pts[pts.length-1][1],peak=Math.max(...pts.map(p=>p[1]));const late=pts.slice(-200).map(p=>p[1]);const osc=Math.max(...late)-Math.min(...late);
+    cap.innerHTML=`最後高度 <b>${final.toFixed(1)} m</b>，最高衝到 <b>${peak.toFixed(1)} m</b>。`+( +ki.value===0&&Math.abs(final-10)>0.5?'只靠 P：推力剛好撐住重力時就不動了 → <b>永遠差一截</b>（穩態誤差）。':'')+(osc>1?' 上下<b>晃個不停</b> → 加 D 當剎車。':'')+(Math.abs(final-10)<0.3&&osc<0.3?' ✅ 準確又穩定！':'');
+    const t0=performance.now();(function f(now){if(my!==anim)return;const k=Math.min(pts.length-1,Math.floor((now-t0)/3000*pts.length));path.setAttribute('d','M'+pts.slice(0,k+1).filter((_,i)=>i%5===0||i===k).map(p=>X(p[0]).toFixed(1)+' '+Y(p[1]).toFixed(1)).join('L'));head.setAttribute('cx',X(pts[k][0]));head.setAttribute('cy',Y(pts[k][1]));dr.setAttribute('y',Y(pts[k][1])-22);if(k<pts.length-1)requestAnimationFrame(f);})(t0);}
+  [kp,ki,kd].forEach(e=>e.addEventListener('change',run));[kp,ki,kd].forEach(e=>e.addEventListener('input',()=>{document.getElementById(e.id+'v').textContent=(+e.value).toFixed(e.id==='ki'?2:1);}));
+  document.querySelectorAll('#pidFig button[data-k]').forEach(b=>b.onclick=()=>{const [a,c,d]=b.dataset.k.split(',');kp.value=a;ki.value=c;kd.value=d;run();});
+  onVisible(document.getElementById('pidFig'),run,.3);
+})();
+/* Kalman */
+(function(){
+  const fl=document.getElementById('kfFlow');
+  const nodes=[[70,'預測','照速度推算'],[230,'量測','鏡頭說在這'],[410,'算信任比例 K','誰比較可靠？'],[620,'新估計','預測＋K×(量測−預測)']];
+  nodes.forEach(([x,a,b],i)=>{S('circle',{cx:x,cy:42,r:i===2?26:22,fill:i===0?'var(--purple)':i===1?'var(--orange)':i===2?'var(--amber)':'var(--blue)',opacity:.9},fl);T(fl,x,84,a,'tx',{'text-anchor':'middle','font-weight':700});T(fl,x,102,b,'ts',{'text-anchor':'middle'});});
+  S('path',{d:'M94 42H204',class:'ln','marker-end':'url(#ah)'},fl);S('path',{d:'M254 42H380',class:'ln','marker-end':'url(#ah)'},fl);S('path',{d:'M438 42H594',class:'ln','marker-end':'url(#ah)'},fl);
+  S('path',{d:'M642 42H720V8H70V18',class:'lnd','marker-end':'url(#ah)'},fl);T(fl,730,46,'下一幀','ts');
+  const kT=T(fl,410,47,'','tx',{'text-anchor':'middle',fill:'#1c1d20','font-weight':700});
+  const svg=document.getElementById('kf');const cap=document.getElementById('kfCap');const N=70;const X=i=>30+i*11,Y=v=>v;
+  const trueP=[];for(let i=0;i<N;i++)trueP.push(120+70*Math.sin(i/10)+20*Math.sin(i/4.3));
+  S('path',{d:'M'+trueP.map((v,i)=>X(i)+' '+Y(v)).join('L'),stroke:'var(--muted)','stroke-width':2,fill:'none','stroke-dasharray':'2 3'},svg);
+  const mG=S('g',{},svg),eP=S('path',{fill:'none',stroke:'var(--blue)','stroke-width':3},svg);
+  T(svg,30,18,'⋯ 真實軌跡','ts');T(svg,140,18,'● 量測（有雜訊）','ts',{fill:'var(--orange)'});T(svg,290,18,'━ 卡爾曼估計','ts',{fill:'var(--blue)'});
+  const nIn=document.getElementById('kfN');let my=0;
+  async function run(){const id=++my;document.getElementById('kfNv').textContent=nIn.value;const sd=+nIn.value;const R=sd*sd,q=6;
+    const r=rng(9);const gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=r();return (u-3)*1.41;};
+    mG.innerHTML='';let p=trueP[0],v=0,P00=400,P01=0,P11=50;const est=[];let errM=0,errE=0;
+    for(let i=0;i<N;i++){if(id!==my)return;
+      const z=trueP[i]+gauss()*sd;
+      // predict
+      p=p+v;P00=P00+2*P01+P11+q/4;P01=P01+P11+q/2;P11=P11+q;
+      const K0=P00/(P00+R),K1=P01/(P00+R);const y=z-p;p+=K0*y;v+=K1*y;const nP00=(1-K0)*P00,nP01=(1-K0)*P01,nP11=P11-K1*P01;P00=nP00;P01=nP01;P11=nP11;
+      est.push(p);errM+=Math.abs(z-trueP[i]);errE+=Math.abs(p-trueP[i]);
+      S('circle',{cx:X(i),cy:Y(z),r:3,fill:'var(--orange)'},mG);eP.setAttribute('d','M'+est.map((e,k)=>X(k)+' '+Y(e)).join('L'));kT.textContent='K='+K0.toFixed(2);
+      await sleep(40);}
+    cap.innerHTML=`平均誤差：量測 <b>${(errM/N).toFixed(1)}</b> → 估計 <b style="color:var(--blue)">${(errE/N).toFixed(1)}</b>。雜訊越大，K 越小（越相信預測）。`;}
+  nIn.addEventListener('change',run);document.getElementById('kfBtn').onclick=run;onVisible(svg,run);
+})();
+/* LiDAR SLAM + EEG */
+(function(){
+  const svg=document.getElementById('slam');
+  const walls=[[20,20,380,20],[380,20,380,170],[380,170,20,170],[20,170,20,20],[230,60,280,60],[280,60,280,105],[280,105,230,105],[230,105,230,60],[90,125,150,125],[150,125,150,170]];
+  const pts=S('g',{},svg);const ray=S('line',{stroke:'var(--red)','stroke-width':1.5,opacity:.8},svg);const dr=U(svg,'i-quad',0,0,30,18,'cB');
+  // EEG meter
+  const mg=S('g',{},svg);T(mg,20,198,'腦波專注度','ts');S('rect',{x:90,y:188,width:120,height:12,rx:4,fill:'var(--soft)'},mg);S('line',{x1:90+72,x2:90+72,y1:184,y2:204,stroke:'var(--muted)','stroke-dasharray':'2 2'},mg);const att=S('rect',{x:90,y:188,height:12,rx:4,fill:'var(--purple)'},mg);const attT=T(mg,220,198,'','ts');T(mg,20,222,'雷射點 → 自動畫出房間地圖','ts');
+  function hit(ox,oy,dx,dy){let best=400;for(const [x1,y1,x2,y2] of walls){const ex=x2-x1,ey=y2-y1;const den=dx*ey-dy*ex;if(Math.abs(den)<1e-9)continue;const t=((x1-ox)*ey-(y1-oy)*ex)/den,u=((x1-ox)*dy-(y1-oy)*dx)/den;if(t>0&&u>=0&&u<=1&&t<best)best=t;}return best;}
+  let ang=0,n=0,t0=performance.now();
+  function f(now){const t=(now-t0)/1000;const ox=110+60*Math.sin(t*0.25),oy=80+30*Math.sin(t*0.5);dr.setAttribute('x',ox-15);dr.setAttribute('y',oy-9);
+    for(let s=0;s<3;s++){ang+=0.11;const dx=Math.cos(ang),dy=Math.sin(ang);const d=hit(ox,oy,dx,dy);ray.setAttribute('x1',ox);ray.setAttribute('y1',oy);ray.setAttribute('x2',ox+dx*d);ray.setAttribute('y2',oy+dy*d);
+      if(n<900){S('circle',{cx:ox+dx*d,cy:oy+dy*d,r:1.6,fill:'var(--fg)'},pts);n++;}}
+    const a=55+35*Math.sin(t*0.9);att.setAttribute('width',a*1.2);attT.textContent=Math.round(a)+(a>60?' → 前進':' → 懸停');
+    requestAnimationFrame(f);}
+  onVisible(document.getElementById('slamFig'),()=>{t0=performance.now();requestAnimationFrame(f);});
+})();
+/* ALNS */
+(function(){
+  const svg=document.getElementById('alns');const cap=document.getElementById('alnsCap');
+  const r=rng(42);const P=[[260,165]];for(let i=0;i<16;i++)P.push([40+r()*440,30+r()*260]);
+  const dist=(a,b)=>Math.hypot(P[a][0]-P[b][0],P[a][1]-P[b][1]);
+  const cost=t=>{let s=0;for(let i=0;i<t.length;i++)s+=dist(t[i],t[(i+1)%t.length]);return s;};
+  const route=S('path',{fill:'none','stroke-width':2.5,'stroke-linejoin':'round'},svg);
+  const nodes=P.map((p,i)=>S('circle',{cx:p[0],cy:p[1],r:i?6:10,fill:i?'var(--blue)':'var(--orange)'},svg));T(svg,P[0][0],P[0][1]+26,'充電站','ts',{'text-anchor':'middle',fill:'var(--orange)'});
+  // right panel
+  const CX0=560,CX1=800,CY0=160,CY1=30;S('rect',{x:540,y:10,width:270,height:300,rx:10,fill:'var(--soft)'},svg);
+  T(svg,556,30,'總路程（越低越好）','ts');const cl=S('path',{fill:'none',stroke:'var(--green)','stroke-width':2},svg);const cT=T(svg,800,30,'','tb',{'text-anchor':'end'});
+  T(svg,556,200,'拆法被選中的機率（自適應）','ts');
+  const ops=['隨機拆 3 點','拆最繞路的 3 點'];const wB=ops.map((o,i)=>{T(svg,556,226+i*36,o,'ts');return S('rect',{x:556,y:232+i*36,height:12,rx:4,fill:i?'var(--purple)':'var(--teal)'},svg);});
+  const wT=ops.map((o,i)=>T(svg,0,243+i*36,'','ts'));
+  const draw=(t,rem,col)=>{route.setAttribute('d','M'+t.map(i=>P[i].join(' ')).join('L')+'Z');route.setAttribute('stroke',col||'var(--muted)');nodes.forEach((n,i)=>{if(i)n.setAttribute('fill',rem&&rem.includes(i)?'var(--red)':'var(--blue)');n.setAttribute('r',i?(rem&&rem.includes(i)?9:6):10);});};
+  const go=player(document.getElementById('alnsBtn'),async W=>{
+    let cur=[0];const rest=[];for(let i=1;i<P.length;i++)rest.push(i);for(let i=rest.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[rest[i],rest[j]]=[rest[j],rest[i]];}cur=cur.concat(rest);
+    let best=cost(cur);const hist=[best];const wts=[1,1];
+    const upW=()=>{const s=wts[0]+wts[1];wts.forEach((w,i)=>{wB[i].setAttribute('width',w/s*200);wT[i].setAttribute('x',560+w/s*200);wT[i].textContent=Math.round(w/s*100)+'%';});};
+    const upC=()=>{const mx=hist[0],mn=Math.min(...hist)*0.9;cl.setAttribute('d','M'+hist.map((c,i)=>(CX0+i*(CX1-CX0)/30).toFixed(1)+' '+(CY0-(c-mn)/(mx-mn)*(CY0-CY1)).toFixed(1)).join('L'));cT.textContent=Math.round(best);};
+    draw(cur);upW();upC();cap.innerHTML='一開始隨便排的路線，很繞';await W(1200);
+    for(let it=0;it<30;it++){
+      const op=r()*(wts[0]+wts[1])<wts[0]?0:1;let rem=[];
+      if(op===0){const c=cur.slice(1);while(rem.length<3){const x=c[Math.floor(r()*c.length)];if(!rem.includes(x))rem.push(x);}}
+      else{const sav=cur.map((n,i)=>{if(!n)return [-1,n];const a=cur[(i-1+cur.length)%cur.length],b=cur[(i+1)%cur.length];return [dist(a,n)+dist(n,b)-dist(a,b)+r()*30,n];}).sort((x,y)=>y[0]-x[0]);rem=sav.slice(0,3).map(s=>s[1]);}
+      let part=cur.filter(n=>!rem.includes(n));draw(part.concat([]),rem,'var(--muted)');cap.innerHTML=`第 ${it+1} 輪 · <b>拆</b>（${ops[op]}）`;await W(it<6?650:220);
+      for(const n of rem){let bi=1,bc=1e9;for(let i=0;i<part.length;i++){const a=part[i],b=part[(i+1)%part.length];const c=dist(a,n)+dist(n,b)-dist(a,b);if(c<bc){bc=c;bi=i+1;}}part.splice(bi,0,n);}
+      const nc=cost(part);const ok=nc<best-0.01;draw(part,null,ok?'var(--green)':'var(--red)');
+      cap.innerHTML=`第 ${it+1} 輪 · <b>補</b>（插到最省的位置）→ ${ok?'<b style="color:var(--green)">變短了，接受！</b>這個拆法加分':'<span style="color:var(--red)">沒變好，放棄</span>'}`;
+      if(ok){cur=part;best=nc;wts[op]+=1.5;}else wts[op]=Math.max(0.3,wts[op]*0.97);hist.push(best);upW();upC();
+      await W(it<6?800:260);draw(cur);}
+    cap.innerHTML=`結束：路程從 ${Math.round(hist[0])} 降到 <b>${Math.round(best)}</b>。真實論文還同時決定充電站位置與巡邏頻率。`;});
+  onVisible(document.getElementById('alnsFig'),go,.4);
+})();
+/* bus + drone */
+(function(){
+  const svg=document.getElementById('bus');
+  const L=100,R=700,Tp=60,B=260;
+  const segs=[[[300,60],[300,160]],[[300,160],[300,260]],[[500,60],[500,160]],[[500,160],[500,260]],[[100,160],[300,160]],[[300,160],[500,160]],[[500,160],[700,160]]];
+  const sEl=segs.map(([a,b])=>S('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],'stroke-width':9,'stroke-linecap':'round'},svg));
+  S('rect',{x:L,y:Tp,width:R-L,height:B-Tp,fill:'none',stroke:'var(--line)','stroke-width':14,rx:4},svg);T(svg,L,292,'灰色粗線＝公車環狀路線','ts');
+  const bus=U(svg,'i-bus',0,0,48,26,'cO');const dr=U(svg,'i-quad',0,0,36,21,'cB');const st=T(svg,0,0,'','ts',{'font-weight':700});
+  S('rect',{x:730,y:70,width:24,height:150,rx:5,fill:'none',stroke:'var(--muted)','stroke-width':2},svg);S('rect',{x:736,y:62,width:12,height:8,rx:2,fill:'var(--muted)'},svg);const bat=S('rect',{x:733,width:18,rx:3},svg);const batT=T(svg,742,238,'','ts',{'text-anchor':'middle'});T(svg,742,254,'電量','ts',{'text-anchor':'middle'});
+  const last=segs.map(()=>-30);
+  const busPos=s=>{s=((s%1600)+1600)%1600;if(s<600)return [L+s,Tp];if(s<800)return [R,Tp+(s-600)];if(s<1400)return [R-(s-800),B];return [L,B-(s-1400)];};
+  const pathA=[[300,60],[300,160],[500,160],[500,260]],pathB=[[500,60],[500,160],[100,160]];
+  const along=(pts,f)=>{let tot=0;const ls=[];for(let i=0;i<pts.length-1;i++){const l=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);ls.push(l);tot+=l;}let d=f*tot;for(let i=0;i<ls.length;i++){if(d<=ls[i]){const k=d/ls[i];return [pts[i][0]+(pts[i+1][0]-pts[i][0])*k,pts[i][1]+(pts[i+1][1]-pts[i][1])*k];}d-=ls[i];}return pts[pts.length-1];};
+  const onSeg=(p)=>segs.forEach(([a,b],i)=>{const minx=Math.min(a[0],b[0])-1,maxx=Math.max(a[0],b[0])+1,miny=Math.min(a[1],b[1])-1,maxy=Math.max(a[1],b[1])+1;if(p[0]>=minx&&p[0]<=maxx&&p[1]>=miny&&p[1]<=maxy)last[i]=simT;});
+  let simT=0,prev=0,battery=100;
+  function f(now){const dt=prev?Math.min(0.1,(now-prev)/1000):0;prev=now;simT+=dt;const t=simT%32;
+    const bp=busPos(100*t);bus.setAttribute('x',bp[0]-24);bus.setAttribute('y',bp[1]-13);
+    let dp,fly=false;
+    if(t>=2&&t<10){dp=along(pathA,(t-2)/8);fly=true;}else if(t>=20&&t<31){dp=along(pathB,(t-20)/11);fly=true;}else dp=[bp[0],bp[1]-16];
+    if(fly)onSeg(dp);battery=Math.max(0,Math.min(100,battery+(fly?-6:9)*dt));
+    dr.setAttribute('x',dp[0]-18);dr.setAttribute('y',dp[1]-10);st.setAttribute('x',dp[0]+20);st.setAttribute('y',dp[1]-12);st.textContent=fly?'巡查中':'⚡ 充電中';st.setAttribute('fill',fly?'var(--blue)':'var(--amber)');
+    sEl.forEach((e,i)=>{const age=Math.min(1,(simT-last[i])/26);e.setAttribute('stroke',`hsl(${130-age*125},60%,${45+age*5}%)`);});
+    bat.setAttribute('y',217-battery*1.44);bat.setAttribute('height',battery*1.44);bat.setAttribute('fill',battery<25?'var(--red)':'var(--green)');batT.textContent=Math.round(battery)+'%';
+    requestAnimationFrame(f);}
+  onVisible(document.getElementById('busFig'),()=>requestAnimationFrame(f));
+})();
+</script>
+
+
+<!-- ===================== MODELS ===================== -->
+<section id="models">
+  <div class="kicker">模型比較（表 6）</div>
+  <h2>準 vs 快：機上 AI 永遠的拉鋸</h2>
+  <p>比較模型前，先懂兩個分數：<b>mAP</b>（抓得準不準）和 <b>FPS</b>（每秒能處理幾張畫面）。</p>
+
+  <div class="grid g2">
+    <div class="fig" style="margin:0" id="iouFig">
+      <div class="fig-h"><span class="tag int">互動</span>IoU：框得多準才算「抓對」？</div>
+      <div class="sv narrow"><svg viewBox="0 0 400 230" id="iou"></svg></div>
+      <div class="ctrl"><label>移動預測框 <input type="range" id="iouX" min="-120" max="120" value="40"></label></div>
+      <p class="cap">IoU＝重疊面積 ÷ 合起來的面積。通常 ≥ 0.5 才算抓對。再把「抓得準（精確率）」和「抓得全（召回率）」綜合平均，就是 <b>mAP</b>（0–100%）。</p>
+    </div>
+    <div class="fig" style="margin:0">
+      <div class="fig-h"><span class="tag anim">動畫</span>FPS：每秒幾張？</div>
+      <div class="sv narrow"><svg viewBox="0 0 400 230" id="fps"></svg></div>
+      <p class="cap">同一個移動目標：FPS 太低，系統看到的是「跳格」的世界，快速目標會追丟。一般 ≥ 30 FPS 才算流暢即時。</p>
+    </div>
+  </div>
+
+  <div class="fig" id="scFig">
+    <div class="fig-h"><span class="tag anim">動畫</span>同一塊板子（Jetson Xavier NX＋TensorRT 加速）上的實測 <span class="ref">[54]，另加 [53]</span></div>
+    <div class="sv"><svg viewBox="0 0 820 340" id="sc"></svg></div>
+    <p class="cap">輕量版（tiny）快了約 <b>4–5 倍</b>，代價是 mAP 掉約 13 個百分點。論文總結：輕量 CNN 在 Xavier NX 上可達 <b>36–81 FPS</b>；全尺寸模型（含 Transformer）準度可 <b>&gt;85–90%</b>，但 <b>&lt;10 FPS</b>，常得靠地面或邊緣伺服器。</p>
+  </div>
+
+  <div class="fig">
+    <div class="fig-h"><span class="tag flow">流程</span>論文提醒：只報 FPS 不夠，要看「端到端延遲」</div>
+    <div class="sv"><svg viewBox="0 0 820 150">
+      <g>
+        <rect x="40" y="60" width="150" height="34" rx="6" class="fTs"/><rect x="190" y="60" width="200" height="34" class="fPs"/><rect x="390" y="60" width="160" height="34" class="fAs"/><rect x="550" y="60" width="230" height="34" rx="6" class="fOs"/>
+        <text x="115" y="82" text-anchor="middle" class="tx">感測擷取</text><text x="290" y="82" text-anchor="middle" class="tx">模型推論</text><text x="470" y="82" text-anchor="middle" class="tx">判斷決策</text><text x="665" y="82" text-anchor="middle" class="tx">動作／傳給地面</text>
+      </g>
+      <path d="M190 54V44H390V54" fill="none" stroke="var(--purple)" stroke-width="2"/><text x="290" y="36" text-anchor="middle" class="ts" style="fill:var(--purple)">多數論文只報這段（FPS）</text>
+      <path d="M40 100V112H780V100" fill="none" stroke="var(--red)" stroke-width="2"/><text x="410" y="132" text-anchor="middle" class="ts" style="fill:var(--red)">真正決定「來不來得及反應」的是整段</text>
+      <circle r="7" class="fR"><animateMotion dur="3.5s" repeatCount="indefinite" path="M40 77H780"/></circle>
+    </svg></div>
+  </div>
+  <div class="grid g2 small">
+    <div class="key">⚠ <b>實驗室 mAP 會騙人</b>：在背景乾淨、光線好、目標不多的場景測出高分，到現場（很多小目標、遮擋、快速移動）常常掉很多。</div>
+    <div class="key">🔋 <b>功耗很少被報告</b>：剪枝 YOLOv4 跑在 FPGA 上約 7.2 W、48 FPS 很省；但無人機的電大多被<b>馬達</b>吃掉，算力省下的電不一定能換到多少飛行時間。</div>
+  </div>
+</section>
+
+<script>
+/* IoU */
+(function(){
+  const svg=document.getElementById('iou');const G=[60,40,150,120];
+  S('rect',{x:G[0],y:G[1],width:G[2],height:G[3],fill:'none',stroke:'var(--green)','stroke-width':3},svg);T(svg,G[0],G[1]-8,'正確答案','ts',{fill:'var(--green)'});
+  const inter=S('rect',{fill:'var(--amber)',opacity:.45},svg);const pr=S('rect',{width:150,height:120,fill:'none',stroke:'var(--orange)','stroke-width':3,'stroke-dasharray':'6 4'},svg);const prl=T(svg,0,0,'模型預測','ts',{fill:'var(--orange)'});
+  const res=T(svg,20,214,'','tb');const x=document.getElementById('iouX');
+  function upd(){const dx=+x.value,dy=dx*0.25;const P=[G[0]+dx,G[1]+dy+10,150,120];pr.setAttribute('x',P[0]);pr.setAttribute('y',P[1]);prl.setAttribute('x',P[0]+P[2]-50);prl.setAttribute('y',P[1]+P[3]+14);
+    const ix=Math.max(G[0],P[0]),iy=Math.max(G[1],P[1]),ax=Math.min(G[0]+G[2],P[0]+P[2]),ay=Math.min(G[1]+G[3],P[1]+P[3]);const iw=Math.max(0,ax-ix),ih=Math.max(0,ay-iy);
+    inter.setAttribute('x',ix);inter.setAttribute('y',iy);inter.setAttribute('width',iw);inter.setAttribute('height',ih);
+    const I=iw*ih,U=G[2]*G[3]*2-I;const v=I/U;res.textContent='IoU = '+v.toFixed(2)+(v>=0.5?'  ✓ 算抓對':'  ✗ 不算');res.setAttribute('fill',v>=0.5?'var(--green)':'var(--red)');}
+  x.addEventListener('input',upd);upd();
+})();
+/* FPS */
+(function(){
+  const svg=document.getElementById('fps');
+  const lanes=[[60,5,'5 FPS'],[150,30,'30 FPS']];const balls=lanes.map(([y,f,l])=>{S('line',{x1:30,x2:380,y1:y,y2:y,stroke:'var(--line)','stroke-width':2},svg);T(svg,30,y-28,l,'tb');const tr=S('g',{},svg);return {y,f,b:U(svg,'i-quad',0,y-6,40,24,f<10?'cR':'cG'),tr,last:-1};});
+  let t0=performance.now();
+  function f(now){const t=(now-t0)/1000;balls.forEach(o=>{const fr=Math.floor(t*o.f);if(fr!==o.last){o.last=fr;const tt=fr/o.f;const x=205+160*Math.sin(tt*2.2);o.b.setAttribute('x',x-20);o.b.setAttribute('y',o.y-18);}});requestAnimationFrame(f);}
+  requestAnimationFrame(f);
+})();
+/* scatter */
+(function(){
+  const svg=document.getElementById('sc');const X=f=>80+f/90*680,Y=m=>290-(m-50)/50*260;
+  S('rect',{x:X(30),y:Y(100),width:X(90)-X(30),height:Y(50)-Y(100),fill:'var(--green-s)',opacity:.6},svg);T(svg,X(88),Y(98),'≥ 30 FPS 即時區','ts',{'text-anchor':'end',fill:'var(--green)'});
+  for(let m=50;m<=100;m+=10){S('line',{x1:X(0),x2:X(90),y1:Y(m),y2:Y(m),stroke:'var(--line)','stroke-width':.7},svg);T(svg,X(0)-8,Y(m)+4,m+'%','ts',{'text-anchor':'end'});}
+  for(let f=0;f<=90;f+=10)T(svg,X(f),Y(50)+18,f,'ts',{'text-anchor':'middle'});
+  T(svg,X(90),Y(50)+34,'FPS（越右越快）','ts',{'text-anchor':'end'});T(svg,X(0),Y(100)-12,'mAP（越上越準）','ts',{'text-anchor':'middle'});
+  const pts=[['YOLOv4（92.6%, 8 FPS）',8,92.6,'var(--blue)',[0,22,'middle']],['YOLOv3（82.2%, 8 FPS）',8,82.2,'var(--blue)',[0,22,'middle']],['YOLOv4-tiny（79.6%, 36.5 FPS）',36.48,79.6,'var(--orange)',[12,4,'start']],['YOLOv3-tiny（63.8%, 36.9 FPS）',36.87,63.8,'var(--orange)',[12,4,'start']],['剪枝 YOLOv4＋MobileNetV3（FPGA, 7.2 W）|82.6%, 48.1 FPS；不同資料集',48.14,82.61,'var(--purple)',[12,-22,'start']]];
+  const arr=S('path',{d:`M${X(9.6)} ${Y(92.6)}Q${X(31)} ${Y(93)} ${X(35.6)} ${Y(81.6)}`,stroke:'var(--muted)','stroke-width':1.6,fill:'none','marker-end':'url(#ah)',opacity:0,class:'fade'},svg);
+  const al=T(svg,X(13),Y(96.5),'換輕量版：快 4.5 倍、準度 −13','tx',{opacity:0,class:'tx fade'});
+  const els=pts.map(([n,f,m,c,o])=>{const g=S('g',{opacity:0,class:'fade'},svg);S('circle',{cx:X(f),cy:Y(m),r:8,fill:c},g);n.split('|').forEach((line,k)=>T(g,X(f)+o[0],Y(m)+o[1]+k*14,line,'ts',{'text-anchor':o[2],fill:'var(--fg)'}));return g;});
+  onVisible(document.getElementById('scFig'),async()=>{for(const e of els){e.setAttribute('opacity',1);await sleep(350);}arr.setAttribute('opacity',1);al.setAttribute('opacity',1);});
+})();
+</script>
+
+<!-- ===================== CHALLENGES ===================== -->
+<section id="challenges">
+  <div class="kicker">RQ4 · 挑戰</div>
+  <h2>7 大挑戰（點圓環跳到該段）</h2>
+  <div class="fig"><div class="sv narrow" style="max-width:520px;margin:0 auto"><svg viewBox="0 0 400 300" id="wheel"></svg></div></div>
+
+  <h3 id="ch1">① 電力管理：一切的根源</h3>
+  <p>電池決定飛多久、能載多重。<b>電池管理系統（BMS）</b>持續盯電壓、電流、溫度，估算兩個關鍵數字，避免過充、過放、過熱造成<b>鼓包、起火甚至爆炸</b>。新研究借用電動車 BMS 的電池模型和充電策略。</p>
+  <div class="fig" id="bmsFig">
+    <div class="fig-h"><span class="tag flow">流程</span><span class="tag int">互動</span>BMS 在做什麼？</div>
+    <div class="sv"><svg viewBox="0 0 820 260" id="bms"></svg></div>
+    <div class="ctrl"><label>充放電次數 <input type="range" id="bmsC" min="0" max="1000" step="10" value="300"><b id="bmsCv">300</b></label><label>剩餘電量 <input type="range" id="bmsS" min="0" max="100" value="70"><b id="bmsSv">70%</b></label></div>
+    <p class="cap" id="bmsCap"></p>
+  </div>
+
+  <h3 id="ch2">② 群飛部署：越多台，越難協調</h3>
+  <p>多台一起飛覆蓋更大，但要避免<b>互撞、重複看同一區</b>，還要不停交換位置、任務、感測資料——<b>通訊量爆炸</b>，在頻譜受限或被干擾時更嚴重。解方：用 AI/ML 讓每台自己做決策、規劃路徑。</p>
+  <div class="fig" id="swFig">
+    <div class="fig-h"><span class="tag int">互動</span>如果每台都要和每台講話</div>
+    <div class="sv"><svg viewBox="0 0 820 260" id="sw"></svg></div>
+    <div class="ctrl"><label>無人機數量 <input type="range" id="swN" min="2" max="24" value="6"><b id="swNv">6</b></label><span class="cap" id="swCap"></span></div>
+  </div>
+
+  <h3 id="ch3">③ 網路拓樸：誰連誰，決定一壞全壞還是能撐</h3>
+  <p>無人機一直移動，連線一直變，路由表要不斷重算，可能掉資料、延遲、甚至斷訊。三種常見結構各有罩門——<b>點節點把它「擊落」看看</b>：</p>
+  <div class="fig" id="topoFig">
+    <div class="fig-h"><span class="tag int">互動</span>點任一節點讓它故障（GS＝地面站）</div>
+    <div class="sv"><svg viewBox="0 0 820 270" id="topo"></svg></div>
+    <div class="ctrl"><button id="topoReset">全部修好</button><span class="cap">紅色＝和地面站失聯。</span></div>
+  </div>
+  <p class="small"><b>解方：</b><span class="chip">自適應發射功率</span><span class="chip">指向性天線</span><span class="chip">多無線電</span><span class="chip">固定編隊＋專職中繼機</span><span class="chip">位置式路由＋預測移動</span><span class="chip">延遲容忍：先存著、帶著飛、再轉送</span></p>
+
+  <h3 id="ch4">④ 連線：飛到看不見的地方（BVLOS）</h3>
+  <p>超出視距時，大樓、樹林、地形會擋訊號；維持連線本身也很耗電。若某台在危險區被擊落，資料要事先轉存到隔壁無人機。解方：5G、網狀網路、AI 分配資源、中繼。</p>
+  <div class="fig" id="relayFig">
+    <div class="fig-h"><span class="tag anim">動畫</span><span class="tag int">互動</span>大樓擋住訊號怎麼辦？</div>
+    <div class="sv"><svg viewBox="0 0 820 220" id="relay"></svg></div>
+    <div class="ctrl"><button class="pri" id="relayBtn">＋ 加中繼無人機</button></div>
+  </div>
+
+  <h3 id="ch5">⑤ 資安：無線電就是攻擊入口</h3>
+  <div class="fig">
+    <div class="fig-h"><span class="tag anim">動畫</span>四種常見攻擊</div>
+    <div class="sv"><svg viewBox="0 0 820 240">
+      <use href="#i-quad" x="120" y="110" width="80" height="46" class="cB"/><text x="160" y="172" text-anchor="middle" class="ts">無人機</text>
+      <use href="#i-tower" x="660" y="100" width="46" height="56" class="cT"/><text x="683" y="172" text-anchor="middle" class="ts">地面站</text>
+      <path d="M205 128H650" stroke="var(--blue)" stroke-width="3"/>
+      <circle r="5" class="fB"><animateMotion dur="2s" repeatCount="indefinite" path="M205 128H650"/></circle>
+      <g><ellipse cx="300" cy="60" rx="20" ry="12" fill="var(--card)" stroke="var(--red)" stroke-width="2.5"/><circle cx="300" cy="60" r="5" class="fR"/><path d="M300 74V124" stroke="var(--red)" stroke-dasharray="3 3"/><text x="300" y="36" text-anchor="middle" class="tx">竊聽／攔截</text></g>
+      <g><path d="M440 30l8 12-8 12 8 12-8 12" fill="none" stroke="var(--red)" stroke-width="2.5"><animate attributeName="opacity" values="1;.2;1" dur=".5s" repeatCount="indefinite"/></path><path d="M454 30l8 12-8 12 8 12-8 12" fill="none" stroke="var(--red)" stroke-width="2.5"><animate attributeName="opacity" values=".2;1;.2" dur=".5s" repeatCount="indefinite"/></path><text x="452" y="20" text-anchor="middle" class="tx">干擾（Jamming）</text>
+        <path d="M450 92V124" stroke="var(--red)" stroke-width="2" marker-end="url(#ahR)"/></g>
+      <g><use href="#i-sat" x="40" y="18" width="36" height="36" class="cG"/><text x="58" y="66" text-anchor="middle" class="ts">真衛星</text>
+        <use href="#i-sat" x="230" y="190" width="36" height="36" class="cR"/><text x="248" y="236" text-anchor="middle" class="tx">GPS 欺騙：假訊號</text>
+        <path d="M232 200L184 146" stroke="var(--red)" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#ahR)"/><path d="M66 50L140 104" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="4 3"/></g>
+      <g><use href="#i-monitor" x="520" y="176" width="40" height="34" class="cR"/><text x="540" y="226" text-anchor="middle" class="tx">劫持：冒充指令</text><path d="M528 178L230 140" stroke="var(--red)" stroke-width="2" marker-end="url(#ahR)"><animate attributeName="stroke-dasharray" values="0 400;400 0" dur="2s" repeatCount="indefinite"/></path></g>
+    </svg></div>
+    <p class="cap">防禦：<b>區塊鏈</b>（防竄改飛行紀錄、去中心化身分）、<b>輕量加密</b>、<b>AI 入侵偵測</b>（含零時差攻擊）、<b>GPS 訊號認證</b>、<b>群內通訊加密</b>。</p>
+  </div>
+  <div class="fig" id="chainFig">
+    <div class="fig-h"><span class="tag int">互動</span>區塊鏈為什麼「改不了」？試著改第 2 筆紀錄</div>
+    <div class="chainrow" id="chain"></div>
+    <div class="ctrl"><button id="chainReset">還原</button><span class="cap" id="chainCap">每個區塊都記著「上一塊的指紋（雜湊值）」。改了任何一個字，指紋就變，後面全部對不上。</span></div>
+    <p class="cap">⚠ 論文也指出：區塊鏈<b>計算量太大</b>，不適合即時監控，未來要找<b>輕量版或混合信任機制</b>。</p>
+  </div>
+
+  <h3 id="ch6">⑥ 成本</h3>
+  <p>好鏡頭、GPS、感測器、高能量電池都貴；比起貨車、單車快遞，無人機營運也更貴。解方：便宜材料、<b>模組化</b>（壞了只換零件）、量產規模、開源軟體、共享基礎設施、政府補助——以及<b>「很多台便宜的」取代「幾台很貴的」</b>。</p>
+  <div class="fig" id="costFig">
+    <div class="fig-h"><span class="tag int">互動</span>同樣預算，被擊落一台會怎樣？</div>
+    <div class="sv"><svg viewBox="0 0 820 170" id="cost"></svg></div>
+    <div class="ctrl"><button class="pri" id="costBtn">💥 各擊落一台</button><button id="costReset">重來</button></div>
+  </div>
+
+  <h3 id="ch7">⑦ 自然環境</h3>
+  <p><span class="chip">強風暴雨、颱風</span><span class="chip">山區亂流</span><span class="chip">森林、偏鄉訊號弱</span><span class="chip">空域擁擠</span><span class="chip">鳥、高草碰撞</span><span class="chip">霧、雲擋感測器</span><span class="chip">極端高溫/嚴寒</span><span class="chip">電磁干擾</span><span class="chip">保護區禁飛</span><span class="chip">都市高樓讓 GPS 失準</span></p>
+  <div class="fig">
+    <div class="fig-h"><span class="tag anim">動畫</span>都市峽谷：GPS 訊號反彈，位置就算錯了</div>
+    <div class="sv"><svg viewBox="0 0 820 230">
+      <use href="#i-sat" x="80" y="8" width="44" height="44" class="cG"/><text x="102" y="64" text-anchor="middle" class="ts">GPS 衛星</text>
+      <use href="#i-building" x="300" y="60" width="70" height="170" class="cM"/><use href="#i-building" x="520" y="40" width="76" height="190" class="cM"/>
+      <use href="#i-quad" x="410" y="140" width="56" height="32" class="cB"/>
+      <path d="M118 44L334 118" stroke="var(--green)" stroke-width="2.5"/><text x="246" y="84" class="tb" style="fill:var(--red)">✕ 被擋</text>
+      <path id="mp" d="M122 40L520 98L450 150" fill="none" stroke="var(--orange)" stroke-width="2.5" stroke-dasharray="6 4"/>
+      <circle r="6" class="fO"><animateMotion dur="2.2s" repeatCount="indefinite"><mpath href="#mp"/></animateMotion></circle>
+      <text x="530" y="92" class="ts" style="fill:var(--orange)" text-anchor="end">反彈 → 多繞一段路</text>
+      <use href="#i-quad" x="456" y="182" width="56" height="32" class="cR" opacity=".45"/><text x="520" y="206" class="ts" style="fill:var(--red)">系統以為在這（錯）</text>
+      <path d="M440 170L476 188" stroke="var(--red)" stroke-dasharray="3 3"/>
+      <text x="640" y="150" class="tx">解方</text><text x="640" y="170" class="ts">・全天候機體</text><text x="640" y="186" class="ts">・LiDAR／雷達／熱像</text><text x="640" y="202" class="ts">・自適應飛控</text>
+    </svg></div>
+  </div>
+</section>
+
+<script>
+/* wheel */
+(function(){
+  const svg=document.getElementById('wheel');const names=['電力','群飛','拓樸','連線','資安','成本','自然'];const cols=['var(--green)','var(--teal)','var(--blue)','var(--purple)','var(--red)','var(--orange)','var(--amber)'];
+  const cx=200,cy=150,R1=128,R0=66;
+  names.forEach((n,i)=>{const a0=(i/7)*2*Math.PI-Math.PI/2+0.02,a1=((i+1)/7)*2*Math.PI-Math.PI/2-0.02;const p=(r,a)=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];const [x0,y0]=p(R1,a0),[x1,y1]=p(R1,a1),[x2,y2]=p(R0,a1),[x3,y3]=p(R0,a0);
+    const g=S('g',{style:'cursor:pointer'},svg);S('path',{d:`M${x0} ${y0}A${R1} ${R1} 0 0 1 ${x1} ${y1}L${x2} ${y2}A${R0} ${R0} 0 0 0 ${x3} ${y3}Z`,fill:cols[i],opacity:.85},g);
+    const am=(a0+a1)/2,[tx,ty]=p((R0+R1)/2,am);T(g,tx,ty+5,n,'tb',{'text-anchor':'middle',fill:'#fff'});
+    g.onclick=()=>document.getElementById('ch'+(i+1)).scrollIntoView({behavior:'smooth'});
+    g.onmouseenter=()=>g.setAttribute('transform',`translate(${Math.cos(am)*6},${Math.sin(am)*6})`);g.onmouseleave=()=>g.setAttribute('transform','');});
+  T(svg,cx,cy-2,'7 大','tb',{'text-anchor':'middle'});T(svg,cx,cy+18,'挑戰','tb',{'text-anchor':'middle'});
+})();
+/* BMS */
+(function(){
+  const svg=document.getElementById('bms');const cap=document.getElementById('bmsCap');
+  const sens=[['V','電壓',40],['A','電流',100],['°C','溫度',160]];
+  sens.forEach(([a,b,y])=>{S('circle',{cx:40,cy:y,r:20,class:'nd'},svg);T(svg,40,y+5,a,'tb',{'text-anchor':'middle'});T(svg,68,y+5,b,'ts');S('path',{d:`M100 ${y}C140 ${y} 150 100 180 100`,class:'ln','marker-end':'url(#ah)'},svg);});
+  U(svg,'i-chip',210,100,56,56,'cP');T(svg,210,146,'BMS','tb',{'text-anchor':'middle'});
+  S('path',{d:'M240 80C270 60 280 50 300 50',class:'ln','marker-end':'url(#ah)'},svg);S('path',{d:'M240 100H300',class:'ln','marker-end':'url(#ah)'},svg);S('path',{d:'M240 120C270 140 280 150 300 150',class:'ln','marker-end':'url(#ah)'},svg);
+  const sohT=T(svg,308,46,'','tx'),socT=T(svg,308,96,'','tx'),alT=T(svg,308,156,'','tx');T(svg,308,62,'SoH 健康度：電池老化剩幾成容量','ts');T(svg,308,112,'SoC 電量：現在還剩幾成電','ts');T(svg,308,172,'異常就警報／切斷','ts');
+  // battery
+  const bx=560,by=40,bw=90,bh=190;S('rect',{x:bx,y:by,width:bw,height:bh,rx:10,fill:'none',stroke:'var(--muted)','stroke-width':2.5,'stroke-dasharray':'5 4'},svg);S('rect',{x:bx+30,y:by-10,width:30,height:10,rx:3,fill:'var(--muted)'},svg);
+  const cap2=S('rect',{x:bx+5,width:bw-10,rx:7,fill:'none',stroke:'var(--fg)','stroke-width':2},svg);const fill=S('rect',{x:bx+8,width:bw-16,rx:5},svg);
+  T(svg,bx+bw/2,by+bh+20,'虛線＝新電池容量','ts',{'text-anchor':'middle'});
+  const ft=T(svg,680,110,'','tbig');T(svg,680,134,'可飛時間（示意）','ts');const fe=T(svg,680,160,'','ts');
+  const c=document.getElementById('bmsC'),s=document.getElementById('bmsS');
+  function upd(){const cyc=+c.value,soc=+s.value/100;const soh=Math.max(0.6,1-cyc*0.0003-(cyc>500?(cyc-500)*0.0003:0));
+    document.getElementById('bmsCv').textContent=cyc;document.getElementById('bmsSv').textContent=Math.round(soc*100)+'%';
+    const hh=(bh-10)*soh;cap2.setAttribute('y',by+bh-5-hh);cap2.setAttribute('height',hh);const fh=(hh-6)*soc;fill.setAttribute('y',by+bh-8-fh);fill.setAttribute('height',Math.max(0,fh));fill.setAttribute('fill',soc<0.2?'var(--red)':soc<0.4?'var(--amber)':'var(--green)');
+    sohT.textContent='SoH = '+Math.round(soh*100)+'%';socT.textContent='SoC = '+Math.round(soc*100)+'%';alT.textContent=soc<0.15?'⚠ 電量過低：立刻返航！':'✓ 正常';alT.setAttribute('fill',soc<0.15?'var(--red)':'var(--green)');
+    const m=45*soh*soc;ft.textContent=Math.round(m)+' 分';fe.textContent='= 45 分 × '+soh.toFixed(2)+' × '+soc.toFixed(2);
+    cap.innerHTML='可飛時間 ≈ 新電池滿電時間 × <b>SoH</b> × <b>SoC</b>。電池越用越「縮水」，同樣顯示 70% 電量，舊電池能飛的時間短很多。（衰退速度為示意）';}
+  c.addEventListener('input',upd);s.addEventListener('input',upd);upd();
+})();
+/* swarm links */
+(function(){
+  const svg=document.getElementById('sw');const n=document.getElementById('swN');const cap=document.getElementById('swCap');
+  const g=S('g',{},svg);const bar=S('rect',{x:560,y:120,height:26,rx:6},svg);T(svg,560,110,'通訊連線數','ts');const bt=T(svg,560,176,'','tbig');S('rect',{x:560,y:120,width:240,height:26,rx:6,fill:'none',stroke:'var(--line)'},svg);
+  function upd(){const N=+n.value;document.getElementById('swNv').textContent=N;g.innerHTML='';const P=[];for(let i=0;i<N;i++){const a=i/N*2*Math.PI-Math.PI/2;P.push([270+110*Math.cos(a),130+110*Math.sin(a)]);}
+    for(let i=0;i<N;i++)for(let j=i+1;j<N;j++)S('line',{x1:P[i][0],y1:P[i][1],x2:P[j][0],y2:P[j][1],stroke:'var(--orange)','stroke-width':1,opacity:.45},g);
+    P.forEach(p=>U(g,'i-quad',p[0],p[1],28,16,'cB'));const L=N*(N-1)/2;bar.setAttribute('width',Math.min(240,L/276*240));bar.setAttribute('fill',L>100?'var(--red)':L>30?'var(--amber)':'var(--green)');bt.textContent=L+' 條';
+    cap.innerHTML=`連線數 = N×(N−1)÷2：台數變 ${N} 倍，連線變約 ${(L/Math.max(1,N)).toFixed(1)}×N —— <b>平方級成長</b>，頻寬很快塞爆。`;}
+  n.addEventListener('input',upd);upd();
+})();
+/* topology */
+(function(){
+  const svg=document.getElementById('topo');
+  const nets=[
+    {name:'星狀：中心一倒全倒',ox:20,nodes:[[130,130,'GS'],[130,40],[210,85],[210,175],[130,220],[50,175],[50,85]],edges:[[0,1],[0,2],[0,3],[0,4],[0,5],[0,6]]},
+    {name:'網狀：耐打，但路由複雜、耗能',ox:290,nodes:[[60,130,'GS'],[120,50],[200,60],[230,140],[180,215],[110,200],[150,130]],edges:[[0,1],[0,5],[0,6],[1,2],[1,6],[2,3],[2,6],[3,4],[3,6],[4,5],[4,6],[5,6]]},
+    {name:'樹狀：中間節點是瓶頸',ox:560,nodes:[[130,30,'GS'],[70,105],[190,105],[35,190],[105,190],[155,190],[225,190]],edges:[[0,1],[0,2],[1,3],[1,4],[2,5],[2,6]]}];
+  nets.forEach(net=>{net.alive=net.nodes.map(()=>true);const g=S('g',{transform:`translate(${net.ox},10)`},svg);T(g,130,256,net.name,'tx',{'text-anchor':'middle','font-weight':700});
+    net.eEl=net.edges.map(([a,b])=>S('line',{x1:net.nodes[a][0],y1:net.nodes[a][1],x2:net.nodes[b][0],y2:net.nodes[b][1],stroke:'var(--muted)','stroke-width':2},g));
+    net.nEl=net.nodes.map((p,i)=>{const c=S('circle',{cx:p[0],cy:p[1],r:p[2]?19:14,style:'cursor:pointer'},g);if(p[2])T(g,p[0],p[1]+5,'GS','tx',{'text-anchor':'middle',fill:'#fff','font-weight':700,'pointer-events':'none'});c.onclick=()=>{net.alive[i]=!net.alive[i];upd(net);};return c;});
+    net.cnt=T(g,250,20,'','ts',{'text-anchor':'end'});upd(net);});
+  function upd(net){const N=net.nodes.length;const reach=new Array(N).fill(false);if(net.alive[0]){reach[0]=true;const q=[0];while(q.length){const u=q.shift();net.edges.forEach(([a,b])=>{const v=a===u?b:b===u?a:-1;if(v>=0&&net.alive[v]&&!reach[v]){reach[v]=true;q.push(v);}});}}
+    net.nEl.forEach((c,i)=>{c.setAttribute('fill',!net.alive[i]?'var(--soft)':reach[i]?(i===0?'var(--orange)':'var(--blue)'):'var(--red)');c.setAttribute('stroke',!net.alive[i]?'var(--muted)':'none');c.setAttribute('stroke-dasharray',!net.alive[i]?'3 3':'none');});
+    net.eEl.forEach((e,k)=>{const [a,b]=net.edges[k];e.setAttribute('opacity',net.alive[a]&&net.alive[b]?1:.15);});
+    const alive=net.alive.filter((x,i)=>x&&i>0).length,ok=reach.filter((x,i)=>x&&i>0).length;net.cnt.textContent='連得上 '+ok+'/'+alive;net.cnt.setAttribute('fill',ok<alive?'var(--red)':'var(--muted)');}
+  document.getElementById('topoReset').onclick=()=>nets.forEach(n=>{n.alive=n.alive.map(()=>true);upd(n);});
+})();
+/* relay */
+(function(){
+  const svg=document.getElementById('relay');let relay=false;
+  U(svg,'i-tower',60,150,40,50,'cT');T(svg,60,196,'地面站','ts',{'text-anchor':'middle'});
+  U(svg,'i-building',380,120,80,200,'cM');
+  const link=S('path',{fill:'none','stroke-width':3},svg);const rl=U(svg,'i-quad',380,0,46,27,'cP');rl.setAttribute('opacity',0);rl.setAttribute('y',-4);
+  const dr=U(svg,'i-quad',0,0,50,29,'cB');const lab=T(svg,0,0,'','tb');
+  const btn=document.getElementById('relayBtn');btn.onclick=()=>{relay=!relay;rl.setAttribute('opacity',relay?1:0);btn.textContent=relay?'－ 移除中繼':'＋ 加中繼無人機';};
+  let t0=performance.now();
+  function f(now){const t=(now-t0)/1000;const x=560+170*Math.sin(t*0.6),y=160;dr.setAttribute('x',x-25);dr.setAttribute('y',y-15);
+    const gx=60,gy=128;const yAt=gy+(y-gy)*((340-gx)/(x-gx));const blocked=x>340&&yAt>20;
+    if(relay){link.setAttribute('d',`M${gx} ${gy}L380 22L${x} ${y}`);link.setAttribute('stroke','var(--green)');link.setAttribute('stroke-dasharray','none');lab.textContent='經中繼繞過大樓 ✓';lab.setAttribute('fill','var(--green)');}
+    else{link.setAttribute('d',`M${gx} ${gy}L${x} ${y}`);link.setAttribute('stroke',blocked?'var(--red)':'var(--green)');link.setAttribute('stroke-dasharray',blocked?'6 5':'none');lab.textContent=blocked?'訊號被大樓擋住 ✕':'看得到，連線正常';lab.setAttribute('fill',blocked?'var(--red)':'var(--green)');}
+    lab.setAttribute('x',Math.min(x-60,640));lab.setAttribute('y',212);requestAnimationFrame(f);}
+  onVisible(document.getElementById('relayFig'),()=>requestAnimationFrame(f));
+})();
+/* blockchain */
+(function(){
+  const box=document.getElementById('chain');const cap=document.getElementById('chainCap');
+  const init=['10:00 起飛，電量 100%','10:12 發現可疑人物 @ 3 區','10:20 影像已回傳','10:31 返航，電量 22%'];
+  const H=s=>{let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}return ('0000000'+h.toString(16)).slice(-8);};
+  let data=init.slice(),stored=[];
+  function seal(){stored=[];let prev='00000000';data.forEach((d,i)=>{stored.push(prev);prev=H(i+d+prev);});}
+  function render(focus){box.innerHTML='';let prevOk=true,prevHash='00000000';
+    data.forEach((d,i)=>{const h=H(i+d+stored[i]);const ok=prevOk&&stored[i]===prevHash;prevOk=ok;prevHash=h;
+      const b=document.createElement('div');b.className='blk'+(ok?'':' bad');
+      b.innerHTML=`<b>區塊 ${i+1}</b><div class="small muted">上一塊指紋：<span class="mono">${stored[i]}</span></div><input value="${d.replace(/"/g,'&quot;')}" data-i="${i}"><div class="small">本塊指紋：<span class="mono">${h}</span></div><div class="small" style="font-weight:700;color:${ok?'var(--green)':'var(--red)'}">${ok?'✓ 對得上':'✗ 鏈斷了'}</div>`;
+      box.appendChild(b);if(i<data.length-1){const a=document.createElement('div');a.className='arr';a.textContent='→';box.appendChild(a);}});
+    box.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',e=>{data[+e.target.dataset.i]=e.target.value;const pos=e.target.selectionStart;render(+e.target.dataset.i);const ni=box.querySelector(`input[data-i="${e.target.dataset.i}"]`);ni.focus();ni.setSelectionRange(pos,pos);cap.innerHTML='你改了一個字 → 這塊的指紋變了 → <b style="color:var(--red)">後面每一塊記的「上一塊指紋」都對不上</b>，竄改一眼就被發現。';}));}
+  seal();render();
+  document.getElementById('chainReset').onclick=()=>{data=init.slice();seal();render();cap.textContent='每個區塊都記著「上一塊的指紋（雜湊值）」。改了任何一個字，指紋就變，後面全部對不上。';};
+})();
+/* cost */
+(function(){
+  const svg=document.getElementById('cost');
+  T(svg,180,22,'方案 A：1 台高階機','tx',{'text-anchor':'middle','font-weight':700});T(svg,600,22,'方案 B：8 台便宜機','tx',{'text-anchor':'middle','font-weight':700});
+  S('line',{x1:400,x2:400,y1:10,y2:160,stroke:'var(--line)'},svg);
+  const big=U(svg,'i-quad',180,80,130,76,'cP');const small=[];for(let i=0;i<8;i++)small.push(U(svg,'i-quad',470+(i%4)*46,60+Math.floor(i/4)*44,40,24,'cB'));
+  const ta=T(svg,180,150,'覆蓋 100%','tb',{'text-anchor':'middle'}),tb=T(svg,600,150,'覆蓋 100%','tb',{'text-anchor':'middle'});
+  document.getElementById('costBtn').onclick=()=>{big.setAttribute('opacity',.15);small[5].setAttribute('opacity',.15);ta.textContent='覆蓋 0% —— 任務中斷';ta.setAttribute('fill','var(--red)');tb.textContent='覆蓋 87.5% —— 繼續任務';tb.setAttribute('fill','var(--green)');};
+  document.getElementById('costReset').onclick=()=>{big.setAttribute('opacity',1);small[5].setAttribute('opacity',1);ta.textContent=tb.textContent='覆蓋 100%';ta.removeAttribute('fill');tb.removeAttribute('fill');};
+})();
+</script>
+
+<!-- ===================== EDGE ===================== -->
+<section id="edge">
+  <div class="kicker">RQ4 · 邊緣運算的算力限制</div>
+  <h2>機上小電腦跑不動大模型，怎麼選？</h2>
+  <p>Jetson Nano、樹莓派、Qualcomm Snapdragon 這類機上晶片，算力、記憶體、電力都遠小於雲端；還有<b>散熱</b>、<b>上傳頻寬</b>、和其他工業物聯網（IIoT）裝置<b>同步</b>的問題。</p>
+  <div class="fig">
+    <div class="fig-h">Jetson Nano 實測：全尺寸 vs 輕量</div>
+    <div class="sv"><svg viewBox="0 0 820 140" id="nano"></svg></div>
+  </div>
+
+  <div class="fig" id="dtFig">
+    <div class="fig-h"><span class="tag flow">流程</span><span class="tag int">互動</span>論文表 7 的決策框架：先看場景，再挑演算法與硬體</div>
+    <div class="sv"><svg viewBox="0 0 820 250" id="dt"></svg></div>
+    <div class="chainrow" id="dtOut" style="margin-top:8px"></div>
+  </div>
+
+  <div class="fig">
+    <div class="fig-h"><span class="tag flow">流程</span>分層運算：越往上算力越強，但越慢、越可能斷線</div>
+    <div class="sv"><svg viewBox="0 0 820 150">
+      <defs><linearGradient id="gUp" x1="0" x2="1"><stop offset="0" stop-color="var(--green)"/><stop offset="1" stop-color="var(--red)"/></linearGradient></defs>
+      <use href="#i-quad" x="90" y="40" width="80" height="46" class="cB"/><text x="130" y="104" text-anchor="middle" class="tb">機上</text><text x="130" y="122" text-anchor="middle" class="ts">輕量模型、立即反應</text>
+      <path d="M190 64H330" class="ln" marker-end="url(#ah)"/>
+      <rect x="370" y="36" width="70" height="50" rx="8" class="fT" opacity=".85"/><g stroke="var(--card)" stroke-width="2"><path d="M380 50h50M380 62h50M380 74h50"/></g><text x="405" y="104" text-anchor="middle" class="tb">邊緣伺服器</text><text x="405" y="122" text-anchor="middle" class="ts">附近基地台／車上</text>
+      <path d="M460 64H600" class="ln" marker-end="url(#ah)"/>
+      <use href="#i-cloud" x="640" y="34" width="80" height="50" class="cM"/><text x="680" y="104" text-anchor="middle" class="tb">雲端</text><text x="680" y="122" text-anchor="middle" class="ts">大模型、長期分析</text>
+      <rect x="130" y="138" width="550" height="6" rx="3" fill="url(#gUp)"/><text x="130" y="20" class="ts">延遲最低</text><text x="680" y="20" text-anchor="end" class="ts">算力最強、延遲最高</text>
+    </svg></div>
+  </div>
+
+  <h3>聯邦學習：資料不出門，模型一起變聰明</h3>
+  <p>表 7 建議群飛用<b>聯邦學習</b>：每台用自己拍到的影像在機上訓練，只把「模型更新」傳回彙整，<b>原始影像不外流</b>，也省頻寬。</p>
+  <div class="fig" id="flFig">
+    <div class="fig-h"><span class="tag anim">動畫</span>一輪聯邦學習</div>
+    <div class="sv"><svg viewBox="0 0 820 260" id="fl"></svg></div>
+    <p class="cap" id="flCap"></p>
+  </div>
+</section>
+
+<script>
+(function(){
+  const svg=document.getElementById('nano');const X=f=>200+f/30*560;
+  S('line',{x1:X(30),x2:X(30),y1:10,y2:110,stroke:'var(--green)','stroke-width':2,'stroke-dasharray':'5 4'},svg);T(svg,X(30),126,'30 FPS 流暢線','ts',{'text-anchor':'end',fill:'var(--green)'});
+  [0,10,20,30].forEach(f=>T(svg,X(f),126,f,'ts',{'text-anchor':'middle'}));
+  T(svg,190,42,'YOLOv3（全尺寸）','tx',{'text-anchor':'end'});T(svg,190,86,'TinyYOLO / MobileNet','tx',{'text-anchor':'end'});
+  const a=S('rect',{x:X(3),y:26,height:24,rx:5,fill:'var(--red)',width:0},svg),b=S('rect',{x:X(15),y:70,height:24,rx:5,fill:'var(--green)',width:0},svg);
+  T(svg,X(7)+8,43,'3–7 FPS','ts');T(svg,X(20)+8,87,'15–20 FPS，準度只掉一點','ts');
+  onVisible(svg,()=>tween(1000,t=>{a.setAttribute('width',(X(7)-X(3))*t);b.setAttribute('width',(X(20)-X(15))*t);}));
+})();
+(function(){
+  const svg=document.getElementById('dt');const out=document.getElementById('dtOut');
+  const sc=[{n:'城市',s:'密集、變化快',alg:['YOLOv5-Nano','MobileNet-SSD','EfficientDet-Lite'],hw:['Jetson Xavier NX','Jetson Orin Nano'],tr:'高準度＋低延遲 ↔ 比較耗電、比較貴'},
+    {n:'鄉村',s:'範圍大、目標少',alg:['TinyYOLOv3','SqueezeNet','MobileNetV2'],hw:['Jetson Nano','Raspberry Pi 4'],tr:'更省電、飛更久 ↔ 準度降低'},
+    {n:'工業 / IIoT',s:'關鍵設施',alg:['TinyYOLO ＋ 異常偵測（混合）'],hw:['Jetson Xavier NX ＋ Edge TPU'],tr:'可靠穩健 ↔ 運算負擔加重'},
+    {n:'群飛',s:'多機協作',alg:['輕量分散式模型','聯邦學習'],hw:['小兵：Raspberry Pi','隊長：Jetson Nano/Xavier'],tr:'可擴充 ↔ 通訊與同步負擔'}];
+  S('circle',{cx:80,cy:125,r:46,class:'nd'},svg);T(svg,80,120,'任務場景','tb',{'text-anchor':'middle'});T(svg,80,140,'是哪種？','ts',{'text-anchor':'middle'});
+  const ys=[32,94,156,218];const E=[],Nn=[];
+  sc.forEach((s,i)=>{E.push(S('path',{d:`M126 125C200 125 200 ${ys[i]} 290 ${ys[i]}`,class:'ln','marker-end':'url(#ah)'},svg));
+    const g=S('g',{style:'cursor:pointer'},svg);Nn.push(S('rect',{x:296,y:ys[i]-24,width:200,height:48,rx:24,class:'nd'},g));T(g,330,ys[i]-2,s.n,'tb');T(g,330,ys[i]+16,s.s,'ts');g.onclick=()=>pick(i);});
+  T(svg,520,40,'← 點一個場景','ts');
+  const flow=S('g',{},svg);
+  function pick(i){E.forEach((e,k)=>e.classList.toggle('on-path',k===i));Nn.forEach((e,k)=>e.classList.toggle('on-node',k===i));const s=sc[i];
+    flow.innerHTML='';S('path',{d:`M496 ${ys[i]}H560`,class:'ln on-path','marker-end':'url(#ahB)'},flow);T(flow,570,ys[i]+5,'推薦組合 ↓','tx',{fill:'var(--blue)','font-weight':700});
+    out.innerHTML=`<div class="card" style="flex:1 1 200px"><div class="small muted">演算法</div>${s.alg.map(a=>'<span class="chip">'+a+'</span>').join('')}</div><div class="arr">→</div><div class="card" style="flex:1 1 200px"><div class="small muted">硬體</div>${s.hw.map(a=>'<span class="chip">'+a+'</span>').join('')}</div><div class="arr">→</div><div class="card" style="flex:1 1 200px"><div class="small muted">要接受的取捨</div><b class="small">${s.tr}</b></div>`;}
+  pick(0);
+})();
+(function(){
+  const svg=document.getElementById('fl');const cap=document.getElementById('flCap');
+  U(svg,'i-cloud',410,48,100,62,'cM');T(svg,410,96,'彙整伺服器','ts',{'text-anchor':'middle'});const avg=T(svg,410,54,'','tx',{'text-anchor':'middle',fill:'#fff','font-weight':700});
+  const DX=[130,320,500,690],DY=200;const rings=[],ups=[],downs=[];
+  DX.forEach((x,i)=>{U(svg,'i-quad',x,DY,64,38,'cB');U(svg,'i-cam',x+44,DY+26,24,18,'cM');T(svg,x,DY+50,'本地影像（不外傳）','ts',{'text-anchor':'middle'});
+    rings.push(S('circle',{cx:x,cy:DY,r:34,fill:'none',stroke:'var(--purple)','stroke-width':3,'stroke-dasharray':'20 12',opacity:0},svg));
+    S('line',{x1:x,y1:DY-24,x2:410,y2:110,stroke:'var(--line)','stroke-width':1.5},svg);
+    ups.push(S('rect',{width:14,height:14,rx:3,fill:'var(--green)',opacity:0},svg));downs.push(S('rect',{width:14,height:14,rx:3,fill:'var(--blue)',opacity:0},svg));});
+  let t0=performance.now();
+  function f(now){const t=((now-t0)/1000)%8;
+    rings.forEach(r=>{r.setAttribute('opacity',t<2.5?1:0);r.setAttribute('transform',`rotate(${t*180} ${r.getAttribute('cx')} ${DY})`);});
+    ups.forEach((u,i)=>{const on=t>=2.5&&t<4.2;const k=Math.min(1,(t-2.5)/1.5);u.setAttribute('opacity',on?1:0);u.setAttribute('x',DX[i]+(410-DX[i])*k-7);u.setAttribute('y',DY-24+(110-DY+24)*k-7);});
+    avg.textContent=t>=4.2&&t<5.5?'平均':'';
+    downs.forEach((u,i)=>{const on=t>=5.5&&t<7.2;const k=Math.min(1,(t-5.5)/1.5);u.setAttribute('opacity',on?1:0);u.setAttribute('x',410+(DX[i]-410)*k-7);u.setAttribute('y',110+(DY-24-110)*k-7);});
+    cap.innerHTML=t<2.5?'① 每台用<b>自己的影像</b>在機上訓練':t<4.2?'② 只上傳<b style="color:var(--green)">模型更新</b>（很小），不傳影像':t<5.5?'③ 伺服器把大家的更新<b>平均</b>起來':t<7.2?'④ 把<b style="color:var(--blue)">更聰明的共同模型</b>發回每台':'重複下一輪…';
+    requestAnimationFrame(f);}
+  onVisible(document.getElementById('flFig'),()=>requestAnimationFrame(f));
+})();
+</script>
+
+<!-- ===================== FUTURE ===================== -->
+<section id="future">
+  <div class="kicker">RQ4 · 未來方向（表 8）</div>
+  <h2>未來研究要往哪走</h2>
+  <div class="tw"><table class="t">
+    <tr><th>問題</th><th>研究缺口</th><th>未來方向</th><th>預期效果</th></tr>
+    <tr><td><b>電池</b></td><td>缺乏有效的能量採集、自適應任務規劃</td><td><span class="chip">鋰硫/鋰空氣、固態電解質、矽負極</span><span class="chip">超級電容混合儲能</span><span class="chip">無線/快充/太陽能自充</span><span class="chip">減重＋熱管理</span></td><td>飛更久、覆蓋更廣</td></tr>
+    <tr><td><b>群飛</b></td><td>任務分配差、易碰撞、大群即時協調難</td><td><span class="chip">AI 動態分工（多代理強化學習、聯邦學習）</span><span class="chip">倫理與法規框架</span><span class="chip">能源感知：快沒電就換手返航</span><span class="chip">5G/6G</span><span class="chip">仿生群體智慧（蟻群、蜂群）</span></td><td>聰明的多機協作</td></tr>
+    <tr><td><b>拓樸</b></td><td>都市峽谷、山區、無 GNSS 區效能差</td><td><span class="chip">自我組織、自我修復拓樸</span><span class="chip">考慮高度的 3D 路由</span><span class="chip">機上 AI＋邊緣運算</span><span class="chip">混合拓樸（星/網/叢集切換）</span><span class="chip">數位孿生預演</span></td><td>難地形也能穩定運作</td></tr>
+    <tr><td><b>資安</b></td><td>干擾、欺騙、攔截、未授權存取</td><td><span class="chip">區塊鏈（防竄改紀錄、金鑰管理）</span><span class="chip">輕量加密</span><span class="chip">AI 入侵偵測、零時差攻擊</span><span class="chip">抗 GPS 欺騙認證</span></td><td>資料保護、網路可信</td></tr>
+    <tr><td><b>連線</b></td><td>頻寬有限、串流延遲、BVLOS 連線弱</td><td><span class="chip">雲端連接</span><span class="chip">6G 生態系</span><span class="chip">區塊鏈＋QKD</span><span class="chip">衛星整合網路</span><span class="chip">無人機↔車輛通訊</span><span class="chip">通訊中繼</span><span class="chip">AI 動態分配頻率</span></td><td>即時掌握、更好的服務品質</td></tr>
+    <tr><td><b>成本</b></td><td>購置、營運、維護都貴</td><td><span class="chip">低成本設計</span><span class="chip">模組化可換零件</span><span class="chip">可擴充群飛架構</span><span class="chip">再生能源</span><span class="chip">政府補助</span></td><td>負擔得起、普及</td></tr>
+    <tr><td><b>自然環境</b></td><td>天候與夜間降低感測和飛行穩定</td><td><span class="chip">抗天候設計</span><span class="chip">地理挑戰</span><span class="chip">續航</span><span class="chip">環境干擾</span><span class="chip">飛航法規</span></td><td>24/7 可靠運作</td></tr>
+  </table></div>
+
+  <h3>群體智慧怎麼運作？蟻群演算法</h3>
+  <p>論文認為未來群飛會用<b>仿生演算法</b>減少對中央指揮的依賴。蟻群演算法的原理：螞蟻沿路留下費洛蒙；<b>短的路來回比較快 → 留下的費洛蒙累積比較快 → 更多螞蟻選它</b>。沒有任何一隻螞蟻「知道」答案，整群卻找到最短路。</p>
+  <div class="fig" id="acoFig">
+    <div class="fig-h"><span class="tag anim">動畫</span>路線越粗＝費洛蒙越多</div>
+    <div class="sv"><svg viewBox="0 0 820 250" id="aco"></svg></div>
+    <div class="ctrl"><button class="pri" id="acoBtn">↺ 重新開始</button><span class="cap" id="acoCap"></span></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const svg=document.getElementById('aco');const cap=document.getElementById('acoCap');
+  const pS=S('path',{d:'M90 125C300 80 520 80 730 125',fill:'none',stroke:'var(--green)','stroke-linecap':'round',opacity:.55},svg);
+  const pL=S('path',{d:'M90 125C120 280 700 280 730 125',fill:'none',stroke:'var(--orange)','stroke-linecap':'round',opacity:.55},svg);
+  S('circle',{cx:90,cy:125,r:22,class:'nd'},svg);T(svg,90,130,'巢','tb',{'text-anchor':'middle'});S('circle',{cx:730,cy:125,r:22,fill:'var(--amber)'},svg);T(svg,730,130,'目標','tx',{'text-anchor':'middle'});
+  const lS=pS.getTotalLength(),lL=pL.getTotalLength();T(svg,410,76,'短路','ts',{'text-anchor':'middle',fill:'var(--green)'});T(svg,410,222,'長路','ts',{'text-anchor':'middle',fill:'var(--orange)'});
+  const antG=S('g',{},svg);let ants=[],tau=[1,1],tick=0;
+  function reset(){antG.innerHTML='';tau=[1,1];tick=0;ants=[];for(let i=0;i<36;i++)ants.push({p:-1,d:0,dir:1,wait:i*6,el:S('circle',{r:3.5,fill:'var(--fg)'},antG)});}
+  function choose(){return Math.random()<tau[0]/(tau[0]+tau[1])?0:1;}
+  function f(){tick++;tau=tau.map(x=>Math.max(0.05,x*0.996));
+    ants.forEach(a=>{if(a.wait>0){a.wait--;a.el.setAttribute('cx',90);a.el.setAttribute('cy',125);return;}if(a.p<0){a.p=choose();a.d=0;a.dir=1;}
+      const L=a.p?lL:lS;a.d+=3.2;if(a.d>=L){tau[a.p]+=40/L*3;a.d=0;a.dir*=-1;a.p=choose();}
+      const path=a.p?pL:pS,len=a.p?lL:lS;const pos=path.getPointAtLength(a.dir>0?a.d:len-a.d);a.el.setAttribute('cx',pos.x);a.el.setAttribute('cy',pos.y);});
+    pS.setAttribute('stroke-width',2+tau[0]*2.2);pL.setAttribute('stroke-width',2+tau[1]*2.2);
+    const pct=Math.round(tau[0]/(tau[0]+tau[1])*100);cap.innerHTML=`選短路的機率：<b style="color:var(--green)">${pct}%</b>`+(pct>85?' → 整群收斂到最短路！':'');requestAnimationFrame(f);}
+  reset();document.getElementById('acoBtn').onclick=reset;onVisible(document.getElementById('acoFig'),()=>requestAnimationFrame(f));
+})();
+</script>
+
+<!-- ===================== WRAP-UP ===================== -->
+<section id="wrapup">
+  <div class="kicker">總結</div>
+  <h2>4 個問題的答案</h2>
+  <div class="grid g2">
+    <div class="card"><div class="n" style="color:var(--blue);font-weight:900;font-size:12px">RQ1 市場</div>2023 年 141 億 → 2032 年約 472 億美元；北美最大（&gt;35%），軍事國防占 60%；推力是安全需求、比直升機便宜、AI 成熟。</div>
+    <div class="card"><div class="n" style="color:var(--blue);font-weight:900;font-size:12px">RQ2 機型與技術</div>旋翼（城市主力）、固定翼（大範圍）、混合、輕於空氣、撲翼。技術核心：<b>機上輕量 AI</b>＋5G/網狀網路＋多種小型感測器；商用穩、學術新。</div>
+    <div class="card"><div class="n" style="color:var(--blue);font-weight:900;font-size:12px">RQ3 應用</div>邊境（感測網、充電線、多準則選機）、農業（NDVI、入侵偵測）、軍事（PID、雙鏡頭追蹤、腦控）、城市（ALNS 路線、公車充電、3D 重建）。</div>
+    <div class="card"><div class="n" style="color:var(--blue);font-weight:900;font-size:12px">RQ4 挑戰與未來</div>電力、群飛、拓樸、連線、資安、成本、自然環境，加上機上算力。未來：新電池、自癒網路、聯邦學習、輕量區塊鏈、6G、模組化、仿生群體。</div>
+  </div>
+
+  <div class="fig">
+    <div class="fig-h">全篇最核心的一張圖：機上 AI 的「不可能三角」</div>
+    <div class="sv narrow" style="max-width:620px;margin:0 auto"><svg viewBox="0 0 520 330">
+      <path d="M260 30L40 290H480Z" fill="var(--soft)" stroke="var(--line)" stroke-width="2"/>
+      <text x="260" y="20" text-anchor="middle" class="tb">準確</text><text x="30" y="314" class="tb">快（低延遲）</text><text x="490" y="314" text-anchor="end" class="tb">省電／便宜</text>
+      <circle cx="236" cy="92" r="9" class="fB"/><text x="220" y="88" class="tx" text-anchor="end">全尺寸模型、Transformer</text><text x="220" y="104" class="ts" text-anchor="end">準，但 &lt;10 FPS、耗電</text>
+      <circle cx="282" cy="66" r="9" class="fM"/><text x="296" y="70" class="ts">丟雲端：準，但延遲＋斷線風險</text>
+      <circle cx="170" cy="250" r="9" class="fO"/><text x="150" y="236" class="tx" text-anchor="middle">輕量 tiny 模型</text><text x="150" y="272" class="ts" text-anchor="middle">36–81 FPS，準度 −13</text>
+      <circle cx="390" cy="258" r="9" class="fP"/><text x="390" y="244" class="ts" text-anchor="middle">FPGA 剪枝：7.2 W</text>
+      <circle cx="262" cy="190" r="12" fill="none" stroke="var(--green)" stroke-width="3" stroke-dasharray="4 3"><animate attributeName="r" values="10;16;10" dur="2s" repeatCount="indefinite"/></circle>
+      <path d="M180 240L250 198" stroke="var(--green)" stroke-width="2" marker-end="url(#ahG)"/><path d="M240 102L258 176" stroke="var(--green)" stroke-width="2" marker-end="url(#ahG)"/>
+      <text x="282" y="186" class="tx" style="fill:var(--green);font-weight:700">研究目標：往中間推</text><text x="282" y="204" class="ts">剪枝、蒸餾、跳層、量化、分層運算</text>
+    </svg></div>
+  </div>
+
+  <h3>論文自己承認的限制</h3>
+  <ul class="tight"><li>只查了特定資料庫與年份，可能漏掉重要研究。</li><li>沒納入產業報告、專利與灰色文獻。</li></ul>
+
+  <h3>讀這篇時要留意的地方</h3>
+  <div class="key warn small">
+    <ul class="tight" style="margin:0">
+      <li><b>CAGR 對不上</b>：13.15% 從 2024 年算到 2032 只有約 432 億，與文中 471.6 億不符（約需 14.4%）。</li>
+      <li><b>引用編號錯位</b>：正文說 UAV-AdNet 是 [18]、SiamAPN++ 是 [19]，表 2 卻標成 [29]、[30]；正文 [26] 稱 AVTrack，但參考文獻 [26] 其實是 CGTrack；正文 [45] 描述的 MDLRP-UM 在表 5 對應 [48]。查原文時以論文標題為準。</li>
+      <li><b>圖 3 地區數字</b>的顏色/標籤與正文「北美 &gt;35%」不易對應，本頁以正文為準。</li>
+      <li>研究方法寫「135 篇中有 35 篇重複」，依流程圖應為 170 篇中 35 篇重複。</li>
+      <li>說排除「純模擬」研究，但表 2、表 5 仍有不少只在模擬中驗證的方法（例如 PPO 群飛）。</li>
+    </ul>
+  </div>
+
+  <h3>名詞小抄</h3>
+  <div class="tw"><table class="t small">
+    <tr><td><b>UAV</b></td><td>無人飛行載具，俗稱無人機</td><td><b>VTOL</b></td><td>垂直起降</td></tr>
+    <tr><td><b>BVLOS</b></td><td>超出操作員目視範圍的飛行</td><td><b>RTK</b></td><td>公分級精準定位技術</td></tr>
+    <tr><td><b>邊緣運算</b></td><td>在資料產生的地方（機上/附近）就地運算</td><td><b>IoT / IIoT</b></td><td>物聯網／工業物聯網</td></tr>
+    <tr><td><b>mAP</b></td><td>物件偵測的平均準確度（0–100%）</td><td><b>FPS</b></td><td>每秒處理幾張畫面</td></tr>
+    <tr><td><b>IoU</b></td><td>預測框和答案框的重疊比例</td><td><b>YOLO</b></td><td>一次看完整張圖就框出物體的快速偵測模型</td></tr>
+    <tr><td><b>WSN</b></td><td>無線感測網路</td><td><b>LiDAR</b></td><td>雷射測距掃描</td></tr>
+    <tr><td><b>SoC / SoH</b></td><td>電池剩餘電量／電池健康度</td><td><b>PRISMA</b></td><td>系統性回顧的標準篩選流程</td></tr>
+    <tr><td><b>CAGR</b></td><td>年複合成長率</td><td><b>QKD</b></td><td>量子金鑰分發</td></tr>
+    <tr><td><b>PPO</b></td><td>一種穩定的強化學習方法（限制每次更新幅度）</td><td><b>ViT</b></td><td>視覺 Transformer，用注意力看整張圖</td></tr>
+  </table></div>
+</section>
+</div>
+
+<footer><div class="wrap">
+  原文：S. Kumar, A. Tiwari, Y. Ahirwar, G. Kumar, M. Y. Arafat, “The Rise of UAV-Based Smart Surveillance: A Systematic Review of Trends and Technologies,” <i>IEEE Access</i>, vol. 13, pp. 181553–181575, 2025. DOI: 10.1109/ACCESS.2025.3621736（CC BY 4.0）。<br>
+  本頁為學習用圖解；標「示意」的數字與互動參數是為了說明原理，並非論文實驗數據。
+</div></footer>
+
+<script>
+(function(){
+  const links=[...document.querySelectorAll('nav.top a')];const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const i=secs.indexOf(e.target);links.forEach((l,k)=>l.classList.toggle('on',k===i));const l=links[i];if(l)l.scrollIntoView({block:'nearest',inline:'center'});}});},{rootMargin:'-45% 0px -50% 0px'});
+  secs.forEach(s=>s&&io.observe(s));
+  const root=document.documentElement;let saved=null;try{saved=localStorage.getItem('uav-theme');}catch(e){}if(saved)root.dataset.theme=saved;
+  document.getElementById('themeBtn').onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;root.dataset.theme=dark?'light':'dark';try{localStorage.setItem('uav-theme',root.dataset.theme);}catch(e){}};
+})();
+</script>
+</body>
+</html>
